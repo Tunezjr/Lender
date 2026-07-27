@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lender Liquidity Atlas</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Lender Liquidity Atlas</p>
+          <h1>Underwrite lending markets with live liquidity context.</h1>
+          <p class="lede">A front-end command center for lender teams to review collateral movement, pool depth, vault routing, rewards pressure, and data confidence from the canonical graph.</p>
+        </div>
+        <aside class="hero-panel" aria-label="Market health summary">
+          <span class="status-dot"></span>
+          <strong>Market health</strong>
+          <p id="health-copy">Loading lender risk posture…</p>
+        </aside>
+      </section>
+
+      <section class="stats" id="stats" aria-label="Liquidity graph metrics"></section>
+
+      <section class="workspace">
+        <section class="map-card">
+          <div class="map-header">
+            <div>
+              <p class="section-label">Connected graph</p>
+              <h2>Liquidity Flow Graph</h2>
+              <p id="snapshot">Loading snapshot…</p>
+            </div>
+            <div class="controls" aria-label="Flow filters">
+              <button class="filter active" data-filter="all" type="button">All</button>
+              <button class="filter" data-filter="MON" type="button">MON</button>
+              <button class="filter" data-filter="USDC" type="button">USDC</button>
+            </div>
+          </div>
+          <svg id="map" viewBox="0 0 1000 560" role="img" aria-label="Lender liquidity flow map"></svg>
+        </section>
+
+        <aside class="detail-card">
+          <p class="section-label">Selected route</p>
+          <h2 id="route-title">Entire book</h2>
+          <p id="route-copy">Choose an asset filter or inspect the graph to focus on lender exposure.</p>
+          <div class="risk-meter" aria-label="Liquidity confidence meter"><span id="risk-fill"></span></div>
+          <dl id="route-metrics"></dl>
+        </aside>
+      </section>
+
+      <section class="tables">
+        <section class="events">
+          <div class="section-heading">
+            <div>
+              <p class="section-label">Audit trail</p>
+              <h2>Canonical Flow Events</h2>
+            </div>
+            <span class="badge">Fixture Data</span>
+          </div>
+          <div id="events"></div>
+        </section>
+        <section class="events">
+          <div class="section-heading">
+            <div>
+              <p class="section-label">Borrowable depth</p>
+              <h2>Entity Attribution</h2>
+            </div>
+          </div>
+          <div id="attributions"></div>
+        </section>
+      </section>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

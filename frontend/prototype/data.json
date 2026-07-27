@@ -1,0 +1,252 @@
+{
+  "generatedAt": "2026-07-18T00:00:00.000Z",
+  "snapshotId": "snapshot:1:fc481f4fddaa5e48",
+  "api": {
+    "data": {
+      "nodes": [
+        {
+          "id": "entity:monad-143:wallet-a",
+          "kind": "entity",
+          "label": "Wallet A"
+        },
+        {
+          "id": "entity:monad-143:monad-bridge",
+          "kind": "entity",
+          "label": "Monad Bridge"
+        },
+        {
+          "id": "entity:monad-143:ambient-mon-usdc-pool",
+          "kind": "entity",
+          "label": "MON / USDC Pool"
+        },
+        {
+          "id": "entity:monad-143:yield-vault",
+          "kind": "entity",
+          "label": "Yield Vault"
+        },
+        {
+          "id": "entity:monad-143:rewards-distributor",
+          "kind": "entity",
+          "label": "Rewards Distributor"
+        },
+        {
+          "id": "asset:monad-143:mon",
+          "kind": "asset",
+          "label": "MON"
+        },
+        {
+          "id": "asset:monad-143:usdc",
+          "kind": "asset",
+          "label": "USDC"
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge:flow:143:0xaaa1:log-1",
+          "kind": "flow",
+          "fromNodeId": "entity:monad-143:monad-bridge",
+          "toNodeId": "entity:monad-143:wallet-a",
+          "weight": 250,
+          "eventId": "flow:143:0xaaa1:log-1"
+        },
+        {
+          "id": "edge:flow:143:0xaaa2:log-2",
+          "kind": "flow",
+          "fromNodeId": "entity:monad-143:wallet-a",
+          "toNodeId": "entity:monad-143:ambient-mon-usdc-pool",
+          "weight": 120,
+          "eventId": "flow:143:0xaaa2:log-2"
+        },
+        {
+          "id": "edge:flow:143:0xaaa2:log-3",
+          "kind": "flow",
+          "fromNodeId": "entity:monad-143:wallet-a",
+          "toNodeId": "entity:monad-143:ambient-mon-usdc-pool",
+          "weight": 450,
+          "eventId": "flow:143:0xaaa2:log-3"
+        },
+        {
+          "id": "edge:flow:143:0xaaa3:log-4",
+          "kind": "flow",
+          "fromNodeId": "entity:monad-143:ambient-mon-usdc-pool",
+          "toNodeId": "entity:monad-143:yield-vault",
+          "weight": 250,
+          "eventId": "flow:143:0xaaa3:log-4"
+        },
+        {
+          "id": "edge:flow:143:0xaaa4:log-5",
+          "kind": "flow",
+          "fromNodeId": "entity:monad-143:rewards-distributor",
+          "toNodeId": "entity:monad-143:wallet-a",
+          "weight": 12,
+          "eventId": "flow:143:0xaaa4:log-5"
+        }
+      ]
+    },
+    "meta": {
+      "generatedAt": "2026-07-18T00:00:00.000Z",
+      "version": "v1"
+    }
+  },
+  "viewModel": {
+    "nodeCount": 7,
+    "edgeCount": 5,
+    "animatedEdgeIds": [
+      "edge:flow:143:0xaaa1:log-1",
+      "edge:flow:143:0xaaa2:log-2",
+      "edge:flow:143:0xaaa2:log-3",
+      "edge:flow:143:0xaaa3:log-4",
+      "edge:flow:143:0xaaa4:log-5"
+    ]
+  },
+  "events": [
+    {
+      "id": "flow:143:0xaaa1:log-1",
+      "chainId": 143,
+      "type": "transfer",
+      "source": {
+        "provider": "prototype-fixture",
+        "reference": "demo-liquidity-flows",
+        "observedAt": "2026-07-18T00:00:00.000Z"
+      },
+      "blockNumber": "100",
+      "transactionHash": "0xaaa1",
+      "fromEntityId": "entity:monad-143:monad-bridge",
+      "toEntityId": "entity:monad-143:wallet-a",
+      "assetId": "asset:monad-143:mon",
+      "amountRaw": "250000000000000000000",
+      "amountDecimal": "250",
+      "confidence": 1
+    },
+    {
+      "id": "flow:143:0xaaa2:log-2",
+      "chainId": 143,
+      "type": "transfer",
+      "source": {
+        "provider": "prototype-fixture",
+        "reference": "demo-liquidity-flows",
+        "observedAt": "2026-07-18T00:00:00.000Z"
+      },
+      "blockNumber": "101",
+      "transactionHash": "0xaaa2",
+      "fromEntityId": "entity:monad-143:wallet-a",
+      "toEntityId": "entity:monad-143:ambient-mon-usdc-pool",
+      "assetId": "asset:monad-143:mon",
+      "amountRaw": "120000000000000000000",
+      "amountDecimal": "120",
+      "confidence": 1
+    },
+    {
+      "id": "flow:143:0xaaa2:log-3",
+      "chainId": 143,
+      "type": "transfer",
+      "source": {
+        "provider": "prototype-fixture",
+        "reference": "demo-liquidity-flows",
+        "observedAt": "2026-07-18T00:00:00.000Z"
+      },
+      "blockNumber": "101",
+      "transactionHash": "0xaaa2",
+      "fromEntityId": "entity:monad-143:wallet-a",
+      "toEntityId": "entity:monad-143:ambient-mon-usdc-pool",
+      "assetId": "asset:monad-143:usdc",
+      "amountRaw": "450000000",
+      "amountDecimal": "450",
+      "confidence": 1
+    },
+    {
+      "id": "flow:143:0xaaa3:log-4",
+      "chainId": 143,
+      "type": "transfer",
+      "source": {
+        "provider": "prototype-fixture",
+        "reference": "demo-liquidity-flows",
+        "observedAt": "2026-07-18T00:00:00.000Z"
+      },
+      "blockNumber": "102",
+      "transactionHash": "0xaaa3",
+      "fromEntityId": "entity:monad-143:ambient-mon-usdc-pool",
+      "toEntityId": "entity:monad-143:yield-vault",
+      "assetId": "asset:monad-143:usdc",
+      "amountRaw": "250000000",
+      "amountDecimal": "250",
+      "confidence": 1
+    },
+    {
+      "id": "flow:143:0xaaa4:log-5",
+      "chainId": 143,
+      "type": "transfer",
+      "source": {
+        "provider": "prototype-fixture",
+        "reference": "demo-liquidity-flows",
+        "observedAt": "2026-07-18T00:00:00.000Z"
+      },
+      "blockNumber": "103",
+      "transactionHash": "0xaaa4",
+      "fromEntityId": "entity:monad-143:rewards-distributor",
+      "toEntityId": "entity:monad-143:wallet-a",
+      "assetId": "asset:monad-143:mon",
+      "amountRaw": "12000000000000000000",
+      "amountDecimal": "12",
+      "confidence": 1
+    }
+  ],
+  "attributions": [
+    {
+      "entityId": "entity:monad-143:wallet-a",
+      "assetId": "asset:monad-143:mon",
+      "inflowRaw": "262000000000000000000",
+      "outflowRaw": "120000000000000000000",
+      "netRaw": "142000000000000000000"
+    },
+    {
+      "entityId": "entity:monad-143:monad-bridge",
+      "assetId": "asset:monad-143:mon",
+      "inflowRaw": "0",
+      "outflowRaw": "250000000000000000000",
+      "netRaw": "-250000000000000000000"
+    },
+    {
+      "entityId": "entity:monad-143:ambient-mon-usdc-pool",
+      "assetId": "asset:monad-143:mon",
+      "inflowRaw": "120000000000000000000",
+      "outflowRaw": "0",
+      "netRaw": "120000000000000000000"
+    },
+    {
+      "entityId": "entity:monad-143:ambient-mon-usdc-pool",
+      "assetId": "asset:monad-143:usdc",
+      "inflowRaw": "450000000",
+      "outflowRaw": "250000000",
+      "netRaw": "200000000"
+    },
+    {
+      "entityId": "entity:monad-143:wallet-a",
+      "assetId": "asset:monad-143:usdc",
+      "inflowRaw": "0",
+      "outflowRaw": "450000000",
+      "netRaw": "-450000000"
+    },
+    {
+      "entityId": "entity:monad-143:yield-vault",
+      "assetId": "asset:monad-143:usdc",
+      "inflowRaw": "250000000",
+      "outflowRaw": "0",
+      "netRaw": "250000000"
+    },
+    {
+      "entityId": "entity:monad-143:rewards-distributor",
+      "assetId": "asset:monad-143:mon",
+      "inflowRaw": "0",
+      "outflowRaw": "12000000000000000000",
+      "netRaw": "-12000000000000000000"
+    }
+  ],
+  "analytics": {
+    "eventCount": 5,
+    "totalRawByAsset": {
+      "asset:monad-143:mon": "382000000000000000000",
+      "asset:monad-143:usdc": "700000000"
+    }
+  }
+}
