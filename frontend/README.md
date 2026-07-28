@@ -19,4 +19,13 @@ Vercel is configured at the repository root to publish the `frontend/` directory
 ## Branch and visibility
 
 The lender frontend is committed on the `main` branch in `frontend/`. The repository root also includes `index.html`, which redirects browsers to `frontend/` for hosts that serve the repository root.
+## Main branch visibility check
+
+Run this from the repository root to confirm the committed main-branch frontend is present and wired to its fixture data:
+
+```bash
+npm run frontend:check
+```
+
+The check verifies `frontend/index.html`, `frontend/app.js`, `frontend/styles.css`, and `frontend/prototype/data.json` so deployment issues are easier to distinguish from missing files.
 
