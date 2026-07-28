@@ -11,3 +11,7 @@ npx http-server frontend
 ```
 
 Then open the local URL shown by the server.
+
+## Deploy
+
+Vercel is configured at the repository root to publish the `frontend/` directory, so the main branch deploy serves `frontend/index.html` with its CSS, JavaScript, and fixture data intact.
