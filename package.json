@@ -72,7 +72,8 @@
     "main:print-contracts": "npm run hardhat:main -- print-contracts",
     "main:print-config": "hardhat --network main print-config --pool Bend",
     "prepublishOnly": "npm run compile",
-    "check:binary": "node scripts/check-no-binary-files.js"
+    "check:binary": "node scripts/check-no-binary-files.js",
+    "frontend:serve": "node scripts/serve-frontend.js"
   },
   "devDependencies": {
     "@chainlink/contracts": "^0.2.2",
