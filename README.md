@@ -246,15 +246,3 @@ Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_
 ```shell
 npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 ```
-
-## Lender Liquidity Atlas frontend
-
-The lender-facing UI is committed on the `main` branch under `frontend/`, with a root `index.html` redirect so static hosts that serve the repository root still open the app. Vercel is configured to publish `frontend/` directly.
-
-Preview it locally from the repository root with:
-
-```bash
-npm run frontend:serve
-```
-
-Open the printed localhost URL to view `frontend/index.html`. If your host serves files from the repository root instead of honoring `vercel.json`, open `/index.html`; it redirects to `/frontend/`.
