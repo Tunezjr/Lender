@@ -1,3 +1,11 @@
 {
-  "outputDirectory": "frontend"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "framework": null,
+  "installCommand": "echo 'skip install — static frontend',
+  "buildCommand": "echo 'skip build — static frontend',
+  "outputDirectory": "frontend",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/$1" }
+  ]
 }
