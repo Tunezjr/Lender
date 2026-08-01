@@ -96,7 +96,7 @@ function initConfigBanner() {
     return;
   }
   banner.hidden = false;
-  banner.innerHTML = `Pool not configured. After you deploy, set <code>window.__LENDER_CONFIG__ = { lendPoolAddress: "0x\u2026" }</code> or edit <code>js/config.js</code>. USDC defaults to Monad <code>${shortAddress(config.usdcAddress)}</code>.`;
+  banner.innerHTML = `<strong>Pool not connected yet.</strong> Lending actions stay local until you set <code>lendPoolAddress</code> in <code>js/config.js</code>. USDC on Monad defaults to <code>${shortAddress(config.usdcAddress)}</code>.`;
 }
 
 function initForms() {
