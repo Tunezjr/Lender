@@ -1,4 +1,3 @@
-import { initNavDropdown } from "./nav-dropdown.js";
 import {
   config,
   isPoolConfigured,
@@ -96,7 +95,7 @@ function initConfigBanner() {
     return;
   }
   banner.hidden = false;
-  banner.innerHTML = `<strong>Pool not connected yet.</strong> Lending actions stay local until you set <code>lendPoolAddress</code> in <code>js/config.js</code>. USDC on Monad defaults to <code>${shortAddress(config.usdcAddress)}</code>.`;
+  banner.innerHTML = `<strong>Pool not connected yet.</strong> Set <code>lendPoolAddress</code> in <code>js/config.js</code> after deploy. USDC defaults to <code>${shortAddress(config.usdcAddress)}</code>.`;
 }
 
 function initForms() {
@@ -119,7 +118,7 @@ function initForms() {
       if (units === "0") throw new Error("Enter a USDC amount greater than 0");
       setStatus(
         borrowStatus,
-        `Ready: borrow ${fromUsdcUnits(units)} USDC against ${shortAddress(collection)} #${tokenId} for ${config.loanDays} days (max ${config.ltvPercent}% LTV). Wire contract calls next.`,
+        `Ready: borrow ${fromUsdcUnits(units)} USDC against ${shortAddress(collection)} #${tokenId} (${config.loanDays}d, max ${config.ltvPercent}% LTV).`,
         "ok"
       );
     } catch (err) {
@@ -136,7 +135,7 @@ function initForms() {
       if (!isPoolConfigured()) throw new Error("Set lendPoolAddress in config before supplying on-chain");
       const units = toUsdcUnits(amount);
       if (units === "0") throw new Error("Enter a USDC amount greater than 0");
-      setStatus(supplyStatus, `Ready: supply ${fromUsdcUnits(units)} USDC liquidity. Wire depositLiquidity next.`, "ok");
+      setStatus(supplyStatus, `Ready: supply ${fromUsdcUnits(units)} USDC.`, "ok");
     } catch (err) {
       setStatus(supplyStatus, err?.message || "Supply failed", "err");
     }
@@ -150,7 +149,7 @@ function initForms() {
       if (!getAddress()) await connectWallet();
       if (!isPoolConfigured()) throw new Error("Set lendPoolAddress in config before repaying on-chain");
       if (loanId === "") throw new Error("Enter a loan ID");
-      setStatus(repayStatus, `Ready: repay loan #${loanId}. Wire repay(loanId) next.`, "ok");
+      setStatus(repayStatus, `Ready: repay loan #${loanId}.`, "ok");
     } catch (err) {
       setStatus(repayStatus, err?.message || "Repay failed", "err");
     }
@@ -160,8 +159,7 @@ function initForms() {
 function initStatsPlaceholder() {
   const map = {
     "#stat-ltv": `${config.ltvPercent}%`,
-    "#stat-term": `${config.loanDays}d`,
-    "#stat-asset": "USDC",
+    "#stat-term": `${config.loanDays} days`,
     "#stat-chain": config.chainName,
   };
   Object.entries(map).forEach(([sel, val]) => {
@@ -171,8 +169,6 @@ function initStatsPlaceholder() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const nav = document.querySelector("[data-nav-root]");
-  if (nav) initNavDropdown(nav);
   initTabs();
   initWalletUi();
   initConfigBanner();
