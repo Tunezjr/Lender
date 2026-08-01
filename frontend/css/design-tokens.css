@@ -1,0 +1,162 @@
+/* ==========================================================================
+   DESIGN TOKENS — fixed reference system
+   Hardcoded values. Import this file, then override per-project as needed.
+   ========================================================================== */
+
+:root {
+  /* ---- Color: core ---- */
+  --indigo:              #533AFD;
+  --navy-ink:             #0D253D;
+  --cream:                #FFF9F0;
+  --sherbet-orange:       #FFB088;
+  --lavender:             #C4B5FD;
+  --ruby-pink:            #F472B6;
+
+  /* ---- Color: dark mode ---- */
+  --dark-bg:              #0A0E17;
+  --dark-surface:         #151A24;
+  --dark-surface-raised:  #1B2130;
+  --dark-text-primary:    #F5F6F8;
+  --dark-text-secondary:  #9AA3B2;
+
+  /* ---- Color: light mode ---- */
+  --light-surface:        #FFFFFF;
+  --light-surface-sunken: #FBF7EF;
+  --light-text-primary:   var(--navy-ink);
+  --light-text-secondary: #5B6B7C;
+
+  /* ---- Borders ---- */
+  --border-subtle-dark:   rgba(255, 255, 255, 0.08);
+  --border-subtle-light:  rgba(13, 37, 61, 0.08);
+
+  /* ---- Gradients ---- */
+  --gradient-hero-light: linear-gradient(
+    135deg,
+    #FFF9F0 0%,
+    #FFB088 25%,
+    #C4B5FD 55%,
+    #533AFD 80%,
+    #F472B6 100%
+  );
+
+  --gradient-app-dark: radial-gradient(
+    ellipse at top left,
+    #1A1530 0%,
+    #0A0E17 60%
+  );
+
+  --gradient-cta: linear-gradient(90deg, #533AFD 0%, #7C5CFF 100%);
+
+  /* ---- Spacing scale (8px base unit) ---- */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-12: 96px;
+
+  /* ---- Layout ---- */
+  --container-max: 1200px;
+  --gutter-mobile: 24px;
+  --gutter-desktop: 64px;
+  --grid-columns: 12;
+  --grid-gap: 24px;
+
+  /* ---- Radius ---- */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-pill: 9999px;
+
+  /* ---- Type ---- */
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --font-weight-display: 300;
+  --font-weight-body: 400;
+  --font-weight-medium: 500;
+  --letter-spacing-heading: -0.02em;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 28px;
+  --text-2xl: 40px;
+  --text-3xl: 56px;
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+}
+
+.hero-gradient {
+  background: var(--gradient-hero-light);
+}
+
+.hero-gradient--skewed {
+  transform: skewY(-8deg);
+  overflow: hidden;
+}
+
+.app-bg-dark {
+  background: var(--gradient-app-dark);
+  color: var(--dark-text-primary);
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--gutter-desktop);
+  }
+}
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  gap: var(--grid-gap);
+}
+
+.card-dark {
+  background: var(--dark-surface);
+  border: 1px solid var(--border-subtle-dark);
+  border-radius: var(--radius-md);
+}
+
+.card-light {
+  background: var(--light-surface);
+  border: 1px solid var(--border-subtle-light);
+  border-radius: var(--radius-md);
+}
+
+.btn-primary {
+  background: var(--gradient-cta);
+  color: white;
+  border-radius: var(--radius-pill);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-display);
+  letter-spacing: var(--letter-spacing-heading);
+  font-feature-settings: "ss01";
+}
+
+.mono-numeric {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum";
+}
