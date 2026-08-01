@@ -1,15 +1,14 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lender — NFT-backed USDC loans</title>
-    <meta name="description" content="Borrow USDC against NFTs. Max 30% LTV. Fixed 7-day terms on Monad." />
+    <title>Lender — Borrow USDC against your NFTs</title>
+    <meta name="description" content="Fixed 7-day terms. Max 30% LTV. Settled in USDC on Monad." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./css/design-tokens.css" />
-    <link rel="stylesheet" href="./css/nav-dropdown.css" />
     <link rel="stylesheet" href="./css/app.css" />
   </head>
   <body>
@@ -19,31 +18,13 @@
           <span class="brand__mark" aria-hidden="true">L</span>
           <span class="brand__name">Lender</span>
         </a>
-
-        <nav class="header-nav nav" data-nav-root aria-label="Primary">
-          <button class="nav-trigger" type="button" data-nav-trigger="product" aria-expanded="false" aria-haspopup="true" aria-controls="panel-product">Product</button>
-          <button class="nav-trigger" type="button" data-nav-trigger="resources" aria-expanded="false" aria-haspopup="true" aria-controls="panel-resources">Resources</button>
-
-          <div data-nav-panel-container>
-            <div class="nav-panel" id="panel-product" data-nav-panel="product" role="region" aria-label="Product" hidden>
-              <div class="nav-panel__grid">
-                <a class="nav-panel__link" href="#borrow"><strong>Borrow</strong><span>Lock an NFT, receive USDC for 7 days</span></a>
-                <a class="nav-panel__link" href="#supply"><strong>Supply</strong><span>Provide USDC liquidity to the pool</span></a>
-                <a class="nav-panel__link" href="#loans"><strong>My loans</strong><span>Repay and unlock collateral</span></a>
-              </div>
-            </div>
-            <div class="nav-panel" id="panel-resources" data-nav-panel="resources" role="region" aria-label="Resources" hidden>
-              <div class="nav-panel__grid">
-                <a class="nav-panel__link" href="https://github.com/Tunezjr/Lender" target="_blank" rel="noreferrer"><strong>Contracts</strong><span>Protocol source on GitHub</span></a>
-                <a class="nav-panel__link" href="https://docs.benddao.xyz" target="_blank" rel="noreferrer"><strong>Protocol docs</strong><span>BendDAO architecture reference</span></a>
-              </div>
-            </div>
-          </div>
-          <div data-nav-backdrop hidden></div>
+        <nav class="header-nav" aria-label="Primary">
+          <a class="nav-link" href="#borrow">Products</a>
+          <a class="nav-link" href="https://github.com/Tunezjr/Lender" target="_blank" rel="noreferrer">Docs</a>
+          <a class="nav-link" href="#borrow">Pricing</a>
         </nav>
-
         <div class="header-actions">
-          <span class="network-pill" title="Wallet network">
+          <span class="network-pill" title="Network">
             <span class="network-pill__dot" id="network-dot"></span>
             <span id="network-label">Monad</span>
           </span>
@@ -54,48 +35,57 @@
 
     <main class="main">
       <section class="hero">
-        <p class="hero__eyebrow">NFT credit · Monad</p>
         <h1>Borrow USDC against your NFTs</h1>
-        <p class="hero__lede">Fixed terms. Hard LTV cap. Collateral unlocks when you repay — or can be liquidated after the due date.</p>
+        <p class="hero__lede">Fixed 7-day terms. Max 30% LTV. Settled in USDC on Monad.</p>
+        <div class="hero__actions">
+          <a class="btn-hero" href="#borrow">Start borrowing →</a>
+          <a class="btn-ghost" href="#borrow">View markets</a>
+        </div>
       </section>
 
       <div class="banner" id="config-banner" hidden></div>
 
       <section class="stats" aria-label="Market parameters">
-        <article class="stat"><p class="stat__label">Max LTV</p><p class="stat__value mono-numeric" id="stat-ltv">30%</p></article>
-        <article class="stat"><p class="stat__label">Loan term</p><p class="stat__value mono-numeric" id="stat-term">7d</p></article>
-        <article class="stat"><p class="stat__label">Borrow asset</p><p class="stat__value" id="stat-asset">USDC</p></article>
-        <article class="stat"><p class="stat__label">Network</p><p class="stat__value" id="stat-chain">Monad</p></article>
+        <article class="stat">
+          <p class="stat__label">Max LTV</p>
+          <p class="stat__value mono-numeric" id="stat-ltv">30%</p>
+        </article>
+        <article class="stat">
+          <p class="stat__label">Term</p>
+          <p class="stat__value mono-numeric" id="stat-term">7 days</p>
+        </article>
+        <article class="stat">
+          <p class="stat__label">Network</p>
+          <p class="stat__value" id="stat-chain">Monad</p>
+        </article>
       </section>
 
       <div class="tabs" role="tablist" aria-label="Actions">
         <button class="tab" type="button" role="tab" data-tab="borrow" aria-selected="true">Borrow</button>
         <button class="tab" type="button" role="tab" data-tab="supply" aria-selected="false">Supply</button>
-        <button class="tab" type="button" role="tab" data-tab="loans" aria-selected="false">My loans</button>
+        <button class="tab" type="button" role="tab" data-tab="loans" aria-selected="false">Portfolio</button>
       </div>
 
       <section id="borrow" class="panel" data-tab-panel="borrow" role="tabpanel">
         <div class="card">
-          <h2 class="card__title">Borrow USDC</h2>
-          <p class="card__subtitle">Approve the NFT, then borrow up to 30% of the collection valuation. Term is fixed at 7 days.</p>
-          <div class="rules">
-            <span class="rule">LTV <strong>30%</strong></span>
-            <span class="rule">Duration <strong>7 days</strong></span>
-            <span class="rule">Asset <strong>USDC</strong></span>
+          <div class="card__head">
+            <h2 class="card__title">Borrow</h2>
           </div>
+          <p class="card__subtitle">Enter NFT details to get started.</p>
           <form id="borrow-form">
             <div class="field">
-              <label for="borrow-collection">NFT collection</label>
-              <input id="borrow-collection" name="collection" placeholder="0x… collection address" autocomplete="off" spellcheck="false" />
+              <label for="borrow-collection">Collection address</label>
+              <input id="borrow-collection" name="collection" placeholder="0x…" autocomplete="off" spellcheck="false" />
             </div>
-            <div class="field">
-              <label for="borrow-token">Token ID</label>
-              <input id="borrow-token" name="tokenId" placeholder="e.g. 42" inputmode="numeric" />
-            </div>
-            <div class="field">
-              <label for="borrow-amount">USDC amount</label>
-              <input id="borrow-amount" name="amount" placeholder="0.00" inputmode="decimal" />
-              <p class="field__hint">Cannot exceed 30% of the admin-set collection valuation.</p>
+            <div class="field__row">
+              <div class="field">
+                <label for="borrow-token">Token ID</label>
+                <input id="borrow-token" name="tokenId" placeholder="42" inputmode="numeric" />
+              </div>
+              <div class="field">
+                <label for="borrow-amount">Amount</label>
+                <input id="borrow-amount" name="amount" placeholder="0.00" inputmode="decimal" />
+              </div>
             </div>
             <button class="btn-primary" type="submit">Lock NFT &amp; borrow</button>
             <p class="status" id="borrow-status" role="status"></p>
@@ -105,8 +95,8 @@
 
       <section id="supply" class="panel" data-tab-panel="supply" role="tabpanel" hidden>
         <div class="card">
-          <h2 class="card__title">Supply USDC</h2>
-          <p class="card__subtitle">Deposit liquidity so borrowers can draw against NFT collateral.</p>
+          <h2 class="card__title">Supply</h2>
+          <p class="card__subtitle">Provide USDC liquidity to the pool.</p>
           <form id="supply-form">
             <div class="field">
               <label for="supply-amount">USDC amount</label>
@@ -119,25 +109,25 @@
       </section>
 
       <section id="loans" class="panel" data-tab-panel="loans" role="tabpanel" hidden>
-        <div class="card" style="margin-bottom: 16px">
-          <h2 class="card__title">Repay a loan</h2>
-          <p class="card__subtitle">Pay principal + interest to unlock the NFT.</p>
+        <div class="card">
+          <h2 class="card__title">Repay</h2>
+          <p class="card__subtitle">Pay principal and interest to unlock collateral.</p>
           <form id="repay-form">
             <div class="field">
               <label for="repay-loan">Loan ID</label>
-              <input id="repay-loan" name="loanId" placeholder="e.g. 1" inputmode="numeric" />
+              <input id="repay-loan" name="loanId" placeholder="1" inputmode="numeric" />
             </div>
             <button class="btn-primary" type="submit">Repay &amp; unlock</button>
             <p class="status" id="repay-status" role="status"></p>
           </form>
         </div>
-        <div class="loans" id="loans-list" aria-live="polite">
-          <div class="loan loan--empty">Connect a wallet and configure the pool to load active loans.</div>
+        <div class="loans" id="loans-list">
+          <div class="loan loan--empty">No active loans yet.</div>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">Lender · NFT-backed USDC credit · Built for Monad</footer>
+    <footer class="site-footer">Lender · NFT-backed USDC credit · Monad</footer>
     <script type="module" src="./js/app.js"></script>
   </body>
 </html>
