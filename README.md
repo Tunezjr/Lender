@@ -1,41 +1,34 @@
-[![Build pass](https://github.com/BendDAO/bend-lending-protocol/actions/workflows/node.js.yml/badge.svg)](https://github.com/BendDAO/bend-lending-protocol/actions/workflows/node.js.yml)
-[![codecov](https://codecov.io/gh/BendDAO/bend-lending-protocol/branch/main/graph/badge.svg?token=Z4Y9S158JS)](https://codecov.io/gh/BendDAO/bend-lending-protocol)
+# Lender Atlas
 
-```
-######                       ######     #    ####### 
-#     # ###### #    # #####  #     #   # #   #     # 
-#     # #      ##   # #    # #     #  #   #  #     # 
-######  #####  # #  # #    # #     # #     # #     # 
-#     # #      #  # # #    # #     # ####### #     # 
-#     # #      #   ## #    # #     # #     # #     # 
-######  ###### #    # #####  ######  #     # ####### 
-```
+[![Build pass](https://github.com/BendDAO/bend-lending-protocol/actions/workflows/node.js.yml/badge.svg)](https://github.com/BendDAO/bend-lending-protocol/actions/workflows/node.js.yml) [![codecov](https://codecov.io/gh/BendDAO/bend-lending-protocol/branch/main/graph/badge.svg?token=Z4Y9S158JS)](https://codecov.io/gh/BendDAO/bend-lending-protocol)
 
-# BendDAO Lending Protocol
+This repository contains the smart contracts source code and markets configuration for Lender. The repository uses Hardhat as development environment for compilation, testing and deployment tasks.
 
-This repository contains the smart contracts source code and markets configuration for BendDAO Lending Protocol. The repository uses Hardhat as development environment for compilation, testing and deployment tasks.
+## What is Lender Atlas? 
 
-## What is BendDAO Lending Protocol?
-
-BendDAO Lending Protocol is a decentralized non-custodial NFT lending protocol where users can participate as depositors or borrowers. Depositors provide liquidity to the market to earn a passive income, while borrowers are able to borrow in an overcollateralized fashion, using NFTs as collateral.
+Lender is a decentralized non-custodial NFT lending protocol where users can participate as depositors or borrowers. Depositors provide liquidity to the market to earn a passive income, while borrowers are able to borrow in an overcollateralized fashion, using NFTs as collateral.
 
 ## Documentation
 
-The documentation of BendDAO Lending Protocol is in the following [BendDAO documentation](https://docs.benddao.xyz) link. At the documentation you can learn more about the protocol, see the contract interfaces, integration guides and audits.
+The documentation of Lender is in the following [documentation](https://docs.benddao.xyz) link. At the documentation you can learn more about the protocol, see the contract interfaces, integration guides and audits.
 
 For getting the latest contracts addresses, please check the [Deployed contracts](https://docs.benddao.xyz/developers/deployed-contracts) page at the documentation to stay up to date.
 
 ## Audits
+
 1. [Verilog Solutions Online Report](https://hackmd.io/@verilog/benddao-audit).
 2. [Certik Online Report](https://www.certik.com/projects/bend-dao).
 
 ## Thanks
-BendDAO lending protocol refers to the architecture design and adopts some of the code of [AAVE](https://github.com/aave).
+
+The backend smart contracts in this repository are forked from [BendDAO](https://github.com/BendDAO/bend-lending-protocol); the frontend was built independently for Lender.
+
+Lender refers to the architecture design and adopts some of the code of [AAVE](https://github.com/aave).
 We are very grateful to AAVE for providing us with an excellent DeFi platform.
 
 ## Connect with the community
 
-You can join at the [Discord](https://discord.gg/benddao) channel or at the [Governance](https://snapshot.org/#/benddao.eth) for asking questions about the protocol or talk about BendDAO with other peers.
+You can join at the [Discord](https://discord.gg/benddao) channel or at the [Governance](https://snapshot.org/#/benddao.eth) for asking questions about the protocol or talk about Lender with other peers.
 
 ## Getting Started
 
@@ -87,14 +80,13 @@ INFURA_KEY=""
 
 # Optional Etherscan key, to automatize the verification of the contracts at Etherscan
 ETHERSCAN_KEY=""
-
 ```
 
 ## Markets configuration
 
-The configurations related with the BendDAO Markets are located at `markets` directory. You can follow the `IBendConfiguration` interface to create new Markets configuration or extend the current BendDAO configuration.
+The configurations related with the Lender Markets are located at `markets` directory. You can follow the `IBendConfiguration` interface to create new Markets configuration or extend the current Lender configuration.
 
-Each market should have his own Market configuration file, and their own set of deployment tasks, using the BendDAO market config and tasks as a reference.
+Each market should have his own Market configuration file, and their own set of deployment tasks, using the Lender market config and tasks as a reference.
 
 ## Test
 
@@ -116,9 +108,10 @@ npm run test
 
 ## Deployments
 
-For deploying BendDAO Lending Protocol, you can use the available scripts located at `package.json`. For a complete list, run `npm run` to see all the tasks.
+For deploying Lender, you can use the available scripts located at `package.json`. For a complete list, run `npm run` to see all the tasks.
 
 ### Prepare
+
 ```
 # In one terminal
 docker-compose up
@@ -134,6 +127,7 @@ yarn install
 ```
 
 ### Localhost dev deployment
+
 ```
 # In first terminal
 npm run hardhat:node
@@ -143,6 +137,7 @@ npm run bend:localhost:dev:migration
 ```
 
 ### Localhost full deployment
+
 ```
 # In first terminal
 npm run hardhat:node
@@ -164,14 +159,15 @@ npx hardhat --network localhost "dev:deploy-mock-bnft-tokens" --pool Bend
 ```
 
 ### Rinkeby full deployment
+
 ```
 # In one terminal
 npm run bend:rinkeby:full:migration
 ```
 
-## Interact with BendDAO Lending Protocol in Mainnet via console
+## Interact with Lender in Mainnet via console
 
-You can interact with BendDAO Lending Protocol at Mainnet network using the Hardhat console, in the scenario where the frontend is down or you want to interact directly. You can check the deployed addresses at [deployed-contracts](https://docs.benddao.xyz/developers/deployed-contracts).
+You can interact with Lender at Mainnet network using the Hardhat console, in the scenario where the frontend is down or you want to interact directly. You can check the deployed addresses at [deployed-contracts](https://docs.benddao.xyz/developers/deployed-contracts).
 
 Run the Hardhat console pointing to the Mainnet network:
 
@@ -212,7 +208,7 @@ It also comes with a variety of other tools, preconfigured to work with the proj
 
 Try running some of the following tasks:
 
-```shell
+```
 npx hardhat accounts
 npx hardhat compile
 npx hardhat clean
@@ -237,12 +233,24 @@ To try out Etherscan verification, you first need to deploy a contract to an Eth
 
 In this project, copy the .env.template file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
 
-```shell
+```
 hardhat run --network ropsten scripts/deploy.js
 ```
 
 Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
 
-```shell
+```
 npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 ```
+
+## Lender Atlas frontend
+
+The lender-facing UI is committed on the `main` branch under `frontend/`, with a root `index.html` redirect so static hosts that serve the repository root still open the app. Vercel is configured to publish `frontend/` directly.
+
+Preview it locally from the repository root with:
+
+```
+npm run frontend:serve
+```
+
+Open the printed localhost URL to view `frontend/index.html`. If your host serves files from the repository root instead of honoring `vercel.json`, open `/index.html`; it redirects to `/frontend/`.
