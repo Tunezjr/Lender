@@ -40,25 +40,9 @@ function initTabs() {
   });
 }
 
-function initWalletUi() {
-  const btn = $("#wallet-btn");
-  const netDot = $("#network-dot");
-  const netLabel = $("#network-label");
-
-  onWalletChange(({ address, short }) => {
-    if (!btn) return;
-    if (address) {
-      btn.textContent = short;
-      btn.classList.add("wallet-btn--connected");
-      btn.dataset.connected = "1";
-    } else {
-      btn.textContent = "Connect wallet";
-      btn.classList.remove("wallet-btn--connected");
-      delete btn.dataset.connected;
-    }
-  });
-
-  btn?.addEventListener("click", async () => {
+function wireConnectButton(btn) {
+  if (!btn) return;
+  btn.addEventListener("click", async () => {
     try {
       if (btn.dataset.connected) {
         disconnectWallet();
@@ -69,6 +53,31 @@ function initWalletUi() {
       alert(e?.message || "Wallet connection failed");
     }
   });
+}
+
+function initWalletUi() {
+  const btn = $("#wallet-btn");
+  const heroBtn = $("#hero-connect");
+  const netDot = $("#network-dot");
+  const netLabel = $("#network-label");
+
+  onWalletChange(({ address, short }) => {
+    [btn, heroBtn].forEach((b) => {
+      if (!b) return;
+      if (address) {
+        b.textContent = short;
+        b.classList.add("wallet-btn--connected");
+        b.dataset.connected = "1";
+      } else {
+        b.textContent = b.id === "hero-connect" ? "Connect Wallet" : "Connect Wallet";
+        b.classList.remove("wallet-btn--connected");
+        delete b.dataset.connected;
+      }
+    });
+  });
+
+  wireConnectButton(btn);
+  wireConnectButton(heroBtn);
 
   async function refreshNetwork() {
     if (!window.ethereum || !netDot || !netLabel) return;

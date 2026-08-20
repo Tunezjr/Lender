@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lender — Borrow USDC against your NFTs</title>
-    <meta name="description" content="Fixed 7-day terms. Max 30% LTV. Settled in USDC on Monad." />
+    <title>Lender — Borrow against your NFTs</title>
+    <meta name="description" content="Lock an NFT and receive USDC in seconds. Max 30% LTV. Fixed 7-day terms on Monad." />
+    <meta name="theme-color" content="#533AFD" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -12,40 +13,59 @@
     <link rel="stylesheet" href="./css/app.css" />
   </head>
   <body>
+    <div class="page-mesh" aria-hidden="true"></div>
+
     <header class="site-header">
       <div class="site-header__inner">
         <a class="brand" href="./">
-          <span class="brand__mark" aria-hidden="true">L</span>
+          <span class="brand__mark" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          </span>
           <span class="brand__name">Lender</span>
         </a>
         <nav class="header-nav" aria-label="Primary">
-          <a class="nav-link" href="#borrow">Products</a>
-          <a class="nav-link" href="https://github.com/Tunezjr/Lender" target="_blank" rel="noreferrer">Docs</a>
-          <a class="nav-link" href="#borrow">Pricing</a>
+          <a class="nav-link" href="#benefits">Benefits</a>
+          <a class="nav-link" href="#how">How it works</a>
+          <a class="nav-link" href="#borrow">App</a>
+          <a class="nav-link" href="#faq">FAQ</a>
         </nav>
         <div class="header-actions">
           <span class="network-pill" title="Network">
             <span class="network-pill__dot" id="network-dot"></span>
             <span id="network-label">Monad</span>
           </span>
-          <button type="button" class="wallet-btn" id="wallet-btn">Connect wallet</button>
+          <button type="button" class="btn-cta" id="wallet-btn">Connect Wallet</button>
         </div>
       </div>
     </header>
 
     <main class="main">
       <section class="hero">
-        <h1>Borrow USDC against your NFTs</h1>
-        <p class="hero__lede">Fixed 7-day terms. Max 30% LTV. Settled in USDC on Monad.</p>
+        <div class="hero__pills">
+          <span class="pill"><span class="pill__icon" aria-hidden="true">⚡</span> Built on Monad</span>
+          <span class="pill"><span class="pill__icon" aria-hidden="true">🛡</span> Non-custodial</span>
+          <span class="pill"><span class="pill__icon" aria-hidden="true">ⓘ</span> Max 30% LTV · 7-day terms</span>
+        </div>
+        <h1>Borrow against your NFTs,<br />instantly.</h1>
+        <p class="hero__lede">
+          Lock an NFT in a non-custodial smart contract and receive USDC in seconds — no credit check, no application. Settled on Monad.
+        </p>
         <div class="hero__actions">
-          <a class="btn-hero" href="#borrow">Start borrowing →</a>
-          <a class="btn-ghost" href="#borrow">View markets</a>
+          <button type="button" class="btn-cta btn-cta--lg" id="hero-connect">Connect Wallet</button>
+          <a class="btn-ghost" href="#how">See how it works</a>
+        </div>
+        <div class="hero__art" aria-hidden="true">
+          <div class="hero__orb">
+            <div class="hero__card">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9l4-6z"/><path d="M2 9h20"/><path d="M12 21 8 9l4-6 4 6-4 12z"/></svg>
+            </div>
+          </div>
         </div>
       </section>
 
       <div class="banner" id="config-banner" hidden></div>
 
-      <section class="stats" aria-label="Market parameters">
+      <section class="stats" id="benefits" aria-label="Market parameters">
         <article class="stat">
           <p class="stat__label">Max LTV</p>
           <p class="stat__value mono-numeric" id="stat-ltv">30%</p>
@@ -58,6 +78,27 @@
           <p class="stat__label">Network</p>
           <p class="stat__value" id="stat-chain">Monad</p>
         </article>
+      </section>
+
+      <section class="how" id="how">
+        <h2 class="section-title">How it works</h2>
+        <div class="how__grid">
+          <article class="how__step">
+            <span class="how__num">1</span>
+            <h3>Connect</h3>
+            <p>Link your wallet on Monad. No account, no KYC.</p>
+          </article>
+          <article class="how__step">
+            <span class="how__num">2</span>
+            <h3>Lock NFT</h3>
+            <p>Choose a listed collection and token. Collateral stays non-custodial.</p>
+          </article>
+          <article class="how__step">
+            <span class="how__num">3</span>
+            <h3>Borrow USDC</h3>
+            <p>Up to 30% LTV, fixed 7-day term. Repay to unlock anytime.</p>
+          </article>
+        </div>
       </section>
 
       <div class="tabs" role="tablist" aria-label="Actions">
@@ -83,7 +124,7 @@
                 <input id="borrow-token" name="tokenId" placeholder="42" inputmode="numeric" />
               </div>
               <div class="field">
-                <label for="borrow-amount">Amount</label>
+                <label for="borrow-amount">Amount (USDC)</label>
                 <input id="borrow-amount" name="amount" placeholder="0.00" inputmode="decimal" />
               </div>
             </div>
@@ -124,6 +165,22 @@
         <div class="loans" id="loans-list">
           <div class="loan loan--empty">No active loans yet.</div>
         </div>
+      </section>
+
+      <section class="faq" id="faq">
+        <h2 class="section-title">FAQ</h2>
+        <details class="faq__item">
+          <summary>What is the maximum LTV?</summary>
+          <p>30% of the NFT’s oracle value. You cannot borrow more than that.</p>
+        </details>
+        <details class="faq__item">
+          <summary>How long is a loan?</summary>
+          <p>Fixed 7-day terms in the product UI. Repay early anytime to unlock the NFT.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Is it custodial?</summary>
+          <p>No. Collateral sits in protocol contracts. Only you can repay and unlock.</p>
+        </details>
       </section>
     </main>
 
