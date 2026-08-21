@@ -14,6 +14,8 @@ import {
   getAddress,
 } from "./wallet.js";
 
+const FEE_PERCENT = 3;
+
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -23,6 +25,12 @@ function setStatus(el, message, kind) {
   el.classList.remove("status--ok", "status--err");
   if (kind === "ok") el.classList.add("status--ok");
   if (kind === "err") el.classList.add("status--err");
+}
+
+function money(n) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return "—";
+  return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
 function initTabs() {
@@ -38,6 +46,124 @@ function initTabs() {
       });
     });
   });
+}
+
+function setWizardStep(step) {
+  $$(".wizard__step").forEach((el) => {
+    el.classList.toggle("is-active", Number(el.dataset.step) === step);
+  });
+  $$("[data-wizard-panel]").forEach((panel) => {
+    if (Number(panel.dataset.wizardPanel) === step) panel.removeAttribute("hidden");
+    else panel.setAttribute("hidden", "");
+  });
+}
+
+function readBorrowDraft() {
+  return {
+    collection: String($("#borrow-collection")?.value || "").trim(),
+    tokenId: String($("#borrow-token")?.value || "").trim(),
+    nftValue: Number(String($("#borrow-value")?.value || "").trim()),
+    amount: String($("#borrow-amount")?.value || "").trim(),
+  };
+}
+
+function updateTermsQuote() {
+  const draft = readBorrowDraft();
+  const collateral = Number.isFinite(draft.nftValue) ? draft.nftValue : 0;
+  const maxBorrow = (collateral * config.ltvPercent) / 100;
+  const amount = Number(draft.amount);
+  const principal = Number.isFinite(amount) && amount > 0 ? amount : 0;
+  const fee = (principal * FEE_PERCENT) / 100;
+  const repay = principal + fee;
+
+  const set = (id, text) => {
+    const el = $(id);
+    if (el) el.textContent = text;
+  };
+
+  set("#term-collateral", collateral > 0 ? `$${money(collateral)}` : "—");
+  set("#term-ltv", `${config.ltvPercent}%`);
+  set("#term-max", collateral > 0 ? `$${money(maxBorrow)} USDC` : "—");
+  set("#term-fee", principal > 0 ? `$${money(fee)}` : "—");
+  set("#term-repay", principal > 0 ? `$${money(repay)}` : "—");
+  set("#term-days", `${config.loanDays} days`);
+
+  set("#sum-collection", draft.collection ? shortAddress(draft.collection) : "—");
+  set("#sum-token", draft.tokenId || "—");
+  set("#sum-principal", principal > 0 ? `$${money(principal)} USDC` : "—");
+  set("#sum-due", principal > 0 ? `$${money(repay)} USDC` : "—");
+
+  return { collateral, maxBorrow, principal, fee, repay, draft };
+}
+
+function initBorrowWizard() {
+  $("#borrow-to-terms")?.addEventListener("click", async () => {
+    const status = $("#borrow-step1-status");
+    const draft = readBorrowDraft();
+    try {
+      if (!getAddress()) await connectWallet();
+      if (!/^0x[a-fA-F0-9]{40}$/.test(draft.collection)) {
+        throw new Error("Enter a valid NFT collection address");
+      }
+      if (draft.tokenId === "" || Number.isNaN(Number(draft.tokenId))) {
+        throw new Error("Enter a valid token ID");
+      }
+      if (!Number.isFinite(draft.nftValue) || draft.nftValue <= 0) {
+        throw new Error("Enter an estimated NFT value greater than 0");
+      }
+      setStatus(status, "", null);
+      updateTermsQuote();
+      setWizardStep(2);
+    } catch (err) {
+      setStatus(status, err?.message || "Invalid NFT details", "err");
+    }
+  });
+
+  $("#borrow-amount")?.addEventListener("input", () => updateTermsQuote());
+
+  $("#borrow-to-confirm")?.addEventListener("click", () => {
+    const status = $("#borrow-step2-status");
+    const { principal, maxBorrow, draft } = updateTermsQuote();
+    try {
+      if (!Number.isFinite(principal) || principal <= 0) {
+        throw new Error("Enter a USDC amount greater than 0");
+      }
+      if (principal > maxBorrow + 1e-9) {
+        throw new Error(`Amount exceeds max borrow ($${money(maxBorrow)} at ${config.ltvPercent}% LTV)`);
+      }
+      toUsdcUnits(draft.amount);
+      setStatus(status, "", null);
+      updateTermsQuote();
+      setWizardStep(3);
+    } catch (err) {
+      setStatus(status, err?.message || "Invalid amount", "err");
+    }
+  });
+
+  $$("[data-wizard-back]").forEach((btn) => {
+    btn.addEventListener("click", () => setWizardStep(Number(btn.dataset.wizardBack)));
+  });
+
+  $("#borrow-confirm")?.addEventListener("click", async () => {
+    const status = $("#borrow-status");
+    const { principal, draft } = updateTermsQuote();
+    try {
+      if (!getAddress()) await connectWallet();
+      if (!isPoolConfigured()) {
+        throw new Error("Set lendPoolAddress in config before borrowing on-chain");
+      }
+      const units = toUsdcUnits(draft.amount);
+      setStatus(
+        status,
+        `Ready: lock ${shortAddress(draft.collection)} #${draft.tokenId} and borrow ${fromUsdcUnits(units)} USDC (${config.loanDays}d, max ${config.ltvPercent}% LTV).`,
+        "ok"
+      );
+    } catch (err) {
+      setStatus(status, err?.message || "Borrow failed", "err");
+    }
+  });
+
+  setWizardStep(1);
 }
 
 function wireConnectButton(btn) {
@@ -69,7 +195,7 @@ function initWalletUi() {
         b.classList.add("wallet-btn--connected");
         b.dataset.connected = "1";
       } else {
-        b.textContent = b.id === "hero-connect" ? "Connect Wallet" : "Connect Wallet";
+        b.textContent = "Connect Wallet";
         b.classList.remove("wallet-btn--connected");
         delete b.dataset.connected;
       }
@@ -108,37 +234,11 @@ function initConfigBanner() {
 }
 
 function initForms() {
-  const borrowStatus = $("#borrow-status");
-  const supplyStatus = $("#supply-status");
-  const repayStatus = $("#repay-status");
-
-  $("#borrow-form")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const collection = String(fd.get("collection") || "").trim();
-    const tokenId = String(fd.get("tokenId") || "").trim();
-    const amount = String(fd.get("amount") || "").trim();
-    try {
-      if (!getAddress()) await connectWallet();
-      if (!isPoolConfigured()) throw new Error("Set lendPoolAddress in config before borrowing on-chain");
-      if (!/^0x[a-fA-F0-9]{40}$/.test(collection)) throw new Error("Enter a valid NFT collection address");
-      if (tokenId === "" || Number.isNaN(Number(tokenId))) throw new Error("Enter a valid token ID");
-      const units = toUsdcUnits(amount);
-      if (units === "0") throw new Error("Enter a USDC amount greater than 0");
-      setStatus(
-        borrowStatus,
-        `Ready: borrow ${fromUsdcUnits(units)} USDC against ${shortAddress(collection)} #${tokenId} (${config.loanDays}d, max ${config.ltvPercent}% LTV).`,
-        "ok"
-      );
-    } catch (err) {
-      setStatus(borrowStatus, err?.message || "Borrow failed", "err");
-    }
-  });
-
   $("#supply-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
     const amount = String(fd.get("amount") || "").trim();
+    const supplyStatus = $("#supply-status");
     try {
       if (!getAddress()) await connectWallet();
       if (!isPoolConfigured()) throw new Error("Set lendPoolAddress in config before supplying on-chain");
@@ -154,33 +254,22 @@ function initForms() {
     e.preventDefault();
     const fd = new FormData(e.target);
     const loanId = String(fd.get("loanId") || "").trim();
+    const repayStatus = $("#repay-status");
     try {
       if (!getAddress()) await connectWallet();
       if (!isPoolConfigured()) throw new Error("Set lendPoolAddress in config before repaying on-chain");
       if (loanId === "") throw new Error("Enter a loan ID");
-      setStatus(repayStatus, `Ready: repay loan #${loanId}.`, "ok");
+      setStatus(repayStatus, `Ready: repay loan #${loanId} and unlock NFT.`, "ok");
     } catch (err) {
       setStatus(repayStatus, err?.message || "Repay failed", "err");
     }
   });
 }
 
-function initStatsPlaceholder() {
-  const map = {
-    "#stat-ltv": `${config.ltvPercent}%`,
-    "#stat-term": `${config.loanDays} days`,
-    "#stat-chain": config.chainName,
-  };
-  Object.entries(map).forEach(([sel, val]) => {
-    const el = $(sel);
-    if (el) el.textContent = val;
-  });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   initTabs();
+  initBorrowWizard();
   initWalletUi();
   initConfigBanner();
   initForms();
-  initStatsPlaceholder();
 });

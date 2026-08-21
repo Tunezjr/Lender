@@ -26,7 +26,7 @@
         <nav class="header-nav" aria-label="Primary">
           <a class="nav-link" href="#benefits">Benefits</a>
           <a class="nav-link" href="#how">How it works</a>
-          <a class="nav-link" href="#borrow">App</a>
+          <a class="nav-link" href="#security">Security</a>
           <a class="nav-link" href="#faq">FAQ</a>
         </nav>
         <div class="header-actions">
@@ -40,6 +40,7 @@
     </header>
 
     <main class="main">
+      <!-- HERO -->
       <section class="hero">
         <div class="hero__pills">
           <span class="pill"><span class="pill__icon" aria-hidden="true">⚡</span> Built on Monad</span>
@@ -65,121 +66,220 @@
 
       <div class="banner" id="config-banner" hidden></div>
 
-      <section class="stats" id="benefits" aria-label="Market parameters">
-        <article class="stat">
-          <p class="stat__label">Max LTV</p>
-          <p class="stat__value mono-numeric" id="stat-ltv">30%</p>
-        </article>
-        <article class="stat">
-          <p class="stat__label">Term</p>
-          <p class="stat__value mono-numeric" id="stat-term">7 days</p>
-        </article>
-        <article class="stat">
-          <p class="stat__label">Network</p>
-          <p class="stat__value" id="stat-chain">Monad</p>
-        </article>
-      </section>
-
-      <section class="how" id="how">
-        <h2 class="section-title">How it works</h2>
-        <div class="how__grid">
-          <article class="how__step">
-            <span class="how__num">1</span>
-            <h3>Connect</h3>
-            <p>Link your wallet on Monad. No account, no KYC.</p>
+      <!-- BENEFITS -->
+      <section class="section" id="benefits">
+        <p class="section-kicker">Benefits</p>
+        <h2 class="section-title">Your NFT is already worth something.</h2>
+        <p class="section-lede">Lender lets you borrow USDC instantly against your NFTs — fully non-custodial, so you always hold the keys.</p>
+        <div class="benefit-grid">
+          <article class="benefit">
+            <div class="benefit__icon" aria-hidden="true">⚡</div>
+            <h3>Instant USDC payout</h3>
+            <p>Get USDC the moment your NFT is locked — no waiting on approvals or underwriting.</p>
           </article>
-          <article class="how__step">
-            <span class="how__num">2</span>
-            <h3>Lock NFT</h3>
-            <p>Choose a listed collection and token. Collateral stays non-custodial.</p>
+          <article class="benefit">
+            <div class="benefit__icon" aria-hidden="true">🛡</div>
+            <h3>Non-custodial by design</h3>
+            <p>Collateral sits in a smart contract, never in a company wallet — you're the only one who can reclaim it.</p>
           </article>
-          <article class="how__step">
-            <span class="how__num">3</span>
-            <h3>Borrow USDC</h3>
-            <p>Up to 30% LTV, fixed 7-day term. Repay to unlock anytime.</p>
+          <article class="benefit">
+            <div class="benefit__icon" aria-hidden="true">◆</div>
+            <h3>Built for Monad speed</h3>
+            <p>Sub-second finality means loans open and close as fast as you can sign.</p>
+          </article>
+          <article class="benefit">
+            <div class="benefit__icon" aria-hidden="true">◎</div>
+            <h3>No credit checks</h3>
+            <p>Your NFT is the collateral. Nothing else about you is reviewed or required.</p>
           </article>
         </div>
       </section>
 
-      <div class="tabs" role="tablist" aria-label="Actions">
-        <button class="tab" type="button" role="tab" data-tab="borrow" aria-selected="true">Borrow</button>
-        <button class="tab" type="button" role="tab" data-tab="supply" aria-selected="false">Supply</button>
-        <button class="tab" type="button" role="tab" data-tab="loans" aria-selected="false">Portfolio</button>
-      </div>
+      <!-- HOW IT WORKS -->
+      <section class="section" id="how">
+        <p class="section-kicker">How it works</p>
+        <h2 class="section-title">Borrow USDC against your NFT in three steps</h2>
+        <p class="section-lede">No paperwork, no waiting, fully on-chain.</p>
+        <div class="how__grid">
+          <article class="how__step">
+            <span class="how__num">1</span>
+            <h3>Connect your wallet</h3>
+            <p>Connect your wallet and select an NFT worth more than the amount you want to borrow. It stays safely in escrow.</p>
+          </article>
+          <article class="how__step">
+            <span class="how__num">2</span>
+            <h3>Lock your NFT</h3>
+            <p>Principal, fee, total owed, and loan-to-value are all shown on-chain before you confirm anything.</p>
+          </article>
+          <article class="how__step">
+            <span class="how__num">3</span>
+            <h3>Receive USDC instantly</h3>
+            <p>Confirm the loan terms and USDC lands in your wallet right away — no credit checks, no waiting.</p>
+          </article>
+        </div>
+      </section>
 
-      <section id="borrow" class="panel" data-tab-panel="borrow" role="tabpanel">
-        <div class="card">
-          <div class="card__head">
-            <h2 class="card__title">Borrow</h2>
-          </div>
-          <p class="card__subtitle">Enter NFT details to get started.</p>
-          <form id="borrow-form">
-            <div class="field">
-              <label for="borrow-collection">Collection address</label>
-              <input id="borrow-collection" name="collection" placeholder="0x…" autocomplete="off" spellcheck="false" />
+      <!-- SECURITY -->
+      <section class="section" id="security">
+        <p class="section-kicker">Security</p>
+        <h2 class="section-title">Your NFT, your escrow</h2>
+        <div class="security-grid">
+          <article class="security-card">
+            <h3>Non-custodial escrow</h3>
+            <p>Collateral sits in protocol contracts. Only you can repay and unlock — no admin key can seize your NFT while terms are met.</p>
+          </article>
+          <article class="security-card">
+            <h3>Transparent terms</h3>
+            <p>LTV, fee, principal, and due date are visible before you sign. Nothing is hidden off-chain.</p>
+          </article>
+          <article class="security-card">
+            <h3>Clear default path</h3>
+            <p>Repaid on time → NFT returns to you. Unpaid past due date → NFT releases to the lender per contract rules.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- APP -->
+      <section class="section section--app" id="app">
+        <p class="section-kicker">App</p>
+        <h2 class="section-title">Borrow, supply, manage</h2>
+
+        <div class="tabs" role="tablist" aria-label="Actions">
+          <button class="tab" type="button" role="tab" data-tab="borrow" aria-selected="true">Borrow</button>
+          <button class="tab" type="button" role="tab" data-tab="supply" aria-selected="false">Supply</button>
+          <button class="tab" type="button" role="tab" data-tab="loans" aria-selected="false">Your Loans</button>
+        </div>
+
+        <!-- BORROW: 3-step wizard -->
+        <section class="panel" data-tab-panel="borrow" role="tabpanel">
+          <div class="wizard" id="borrow-wizard">
+            <div class="wizard__steps" aria-label="Borrow steps">
+              <button type="button" class="wizard__step is-active" data-step="1">1 · Select NFT</button>
+              <button type="button" class="wizard__step" data-step="2">2 · Loan terms</button>
+              <button type="button" class="wizard__step" data-step="3">3 · Confirm</button>
             </div>
-            <div class="field__row">
+
+            <div class="card" data-wizard-panel="1">
+              <h2 class="card__title">Select NFT</h2>
+              <p class="card__subtitle">Enter the collection and token you want to lock as collateral.</p>
+              <div class="field">
+                <label for="borrow-collection">Collection address</label>
+                <input id="borrow-collection" name="collection" placeholder="0x…" autocomplete="off" spellcheck="false" />
+              </div>
               <div class="field">
                 <label for="borrow-token">Token ID</label>
                 <input id="borrow-token" name="tokenId" placeholder="42" inputmode="numeric" />
               </div>
               <div class="field">
-                <label for="borrow-amount">Amount (USDC)</label>
-                <input id="borrow-amount" name="amount" placeholder="0.00" inputmode="decimal" />
+                <label for="borrow-value">Estimated NFT value (USD)</label>
+                <input id="borrow-value" name="nftValue" placeholder="1000" inputmode="decimal" />
               </div>
+              <button type="button" class="btn-primary" id="borrow-to-terms">Continue to loan terms</button>
+              <p class="status" id="borrow-step1-status" role="status"></p>
             </div>
-            <button class="btn-primary" type="submit">Lock NFT &amp; borrow</button>
-            <p class="status" id="borrow-status" role="status"></p>
-          </form>
-        </div>
+
+            <div class="card" data-wizard-panel="2" hidden>
+              <h2 class="card__title">Loan terms</h2>
+              <p class="card__subtitle">Instant quote. No commitment until you confirm.</p>
+              <div class="terms">
+                <div class="terms__row"><span>Collateral value</span><span class="mono-numeric" id="term-collateral">—</span></div>
+                <div class="terms__row"><span>Max LTV</span><span class="mono-numeric" id="term-ltv">30%</span></div>
+                <div class="terms__row"><span>Max borrow</span><span class="mono-numeric" id="term-max">—</span></div>
+                <div class="terms__row">
+                  <label for="borrow-amount">Amount (USDC)</label>
+                  <input id="borrow-amount" name="amount" placeholder="0.00" inputmode="decimal" />
+                </div>
+                <div class="terms__row"><span>Fee (3%)</span><span class="mono-numeric" id="term-fee">—</span></div>
+                <div class="terms__row"><span>You'll repay</span><span class="mono-numeric" id="term-repay">—</span></div>
+                <div class="terms__row"><span>Term</span><span class="mono-numeric" id="term-days">7 days</span></div>
+              </div>
+              <div class="wizard__nav">
+                <button type="button" class="btn-ghost" data-wizard-back="1">Back</button>
+                <button type="button" class="btn-primary" id="borrow-to-confirm">Continue</button>
+              </div>
+              <p class="status" id="borrow-step2-status" role="status"></p>
+            </div>
+
+            <div class="card" data-wizard-panel="3" hidden>
+              <h2 class="card__title">Confirm &amp; lock NFT</h2>
+              <p class="card__subtitle">Review and lock collateral to receive USDC.</p>
+              <div class="terms terms--summary">
+                <div class="terms__row"><span>Collection</span><span class="mono-numeric" id="sum-collection">—</span></div>
+                <div class="terms__row"><span>Token ID</span><span class="mono-numeric" id="sum-token">—</span></div>
+                <div class="terms__row"><span>Principal</span><span class="mono-numeric" id="sum-principal">—</span></div>
+                <div class="terms__row"><span>Total due</span><span class="mono-numeric" id="sum-due">—</span></div>
+                <div class="terms__row"><span>Term</span><span class="mono-numeric">7 days</span></div>
+              </div>
+              <div class="wizard__nav">
+                <button type="button" class="btn-ghost" data-wizard-back="2">Back</button>
+                <button type="button" class="btn-primary" id="borrow-confirm">Confirm &amp; Lock NFT</button>
+              </div>
+              <p class="status" id="borrow-status" role="status"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-tab-panel="supply" role="tabpanel" hidden>
+          <div class="card">
+            <h2 class="card__title">Supply</h2>
+            <p class="card__subtitle">Provide USDC liquidity to the pool.</p>
+            <form id="supply-form">
+              <div class="field">
+                <label for="supply-amount">USDC amount</label>
+                <input id="supply-amount" name="amount" placeholder="0.00" inputmode="decimal" />
+              </div>
+              <button class="btn-primary" type="submit">Supply liquidity</button>
+              <p class="status" id="supply-status" role="status"></p>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel" data-tab-panel="loans" role="tabpanel" hidden>
+          <div class="card">
+            <h2 class="card__title">Your Loans</h2>
+            <p class="card__subtitle">Track active positions. Repay to unlock collateral.</p>
+            <form id="repay-form" class="repay-inline">
+              <div class="field">
+                <label for="repay-loan">Loan ID</label>
+                <input id="repay-loan" name="loanId" placeholder="1" inputmode="numeric" />
+              </div>
+              <button class="btn-primary" type="submit">Repay &amp; Unlock NFT</button>
+              <p class="status" id="repay-status" role="status"></p>
+            </form>
+          </div>
+          <div class="loans" id="loans-list">
+            <div class="loan loan--empty">No loans yet. Borrow against an NFT to see it listed here.</div>
+          </div>
+        </section>
       </section>
 
-      <section id="supply" class="panel" data-tab-panel="supply" role="tabpanel" hidden>
-        <div class="card">
-          <h2 class="card__title">Supply</h2>
-          <p class="card__subtitle">Provide USDC liquidity to the pool.</p>
-          <form id="supply-form">
-            <div class="field">
-              <label for="supply-amount">USDC amount</label>
-              <input id="supply-amount" name="amount" placeholder="0.00" inputmode="decimal" />
-            </div>
-            <button class="btn-primary" type="submit">Supply liquidity</button>
-            <p class="status" id="supply-status" role="status"></p>
-          </form>
-        </div>
-      </section>
-
-      <section id="loans" class="panel" data-tab-panel="loans" role="tabpanel" hidden>
-        <div class="card">
-          <h2 class="card__title">Repay</h2>
-          <p class="card__subtitle">Pay principal and interest to unlock collateral.</p>
-          <form id="repay-form">
-            <div class="field">
-              <label for="repay-loan">Loan ID</label>
-              <input id="repay-loan" name="loanId" placeholder="1" inputmode="numeric" />
-            </div>
-            <button class="btn-primary" type="submit">Repay &amp; unlock</button>
-            <p class="status" id="repay-status" role="status"></p>
-          </form>
-        </div>
-        <div class="loans" id="loans-list">
-          <div class="loan loan--empty">No active loans yet.</div>
-        </div>
-      </section>
-
-      <section class="faq" id="faq">
-        <h2 class="section-title">FAQ</h2>
+      <!-- FAQ -->
+      <section class="section faq" id="faq">
+        <p class="section-kicker">FAQ</p>
+        <h2 class="section-title">Frequently asked questions</h2>
+        <details class="faq__item">
+          <summary>Which wallets are supported?</summary>
+          <p>MetaMask, Coinbase Wallet, Rabby, and any standard browser wallet that supports Monad.</p>
+        </details>
         <details class="faq__item">
           <summary>What is the maximum LTV?</summary>
-          <p>30% of the NFT’s oracle value. You cannot borrow more than that.</p>
+          <p>30% of the NFT’s value. You cannot borrow more than that.</p>
         </details>
         <details class="faq__item">
           <summary>How long is a loan?</summary>
-          <p>Fixed 7-day terms in the product UI. Repay early anytime to unlock the NFT.</p>
+          <p>Fixed 7-day terms. Repay early anytime to unlock the NFT.</p>
         </details>
         <details class="faq__item">
-          <summary>Is it custodial?</summary>
-          <p>No. Collateral sits in protocol contracts. Only you can repay and unlock.</p>
+          <summary>Are there any fees?</summary>
+          <p>A 3% fee is shown on the loan terms screen before you confirm.</p>
+        </details>
+        <details class="faq__item">
+          <summary>What happens if I don't repay?</summary>
+          <p>Repaid on time → NFT returns to you. Unpaid past due date → NFT releases to the lender per escrow rules.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Is my NFT ever at risk from a hack or admin action?</summary>
+          <p>Collateral is held in non-custodial contracts. There is no company wallet holding your NFT.</p>
         </details>
       </section>
     </main>
