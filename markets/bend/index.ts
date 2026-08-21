@@ -66,6 +66,10 @@ export const BendConfig: IBendConfiguration = {
       DAI: '0x51EA2fEb1b1EB0891595f846456068D497734ca4',
       USDC: '0xB07416EFa22C8A502ff3845D3c0BdA400f929cB8',
     },
+    [eEthereumNetwork.monad]: {
+      WETH: '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A', // WMON
+      USDC: '0x754704Bc059F8C67012fEd69BC8A327a5aafb603',
+    },
     [eEthereumNetwork.main]: {
       WETH: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     },
@@ -105,6 +109,9 @@ export const BendConfig: IBendConfiguration = {
       MAYC: '0x9C235dF4053a415f028b8386ed13ae8162843a6e',
       CLONEX: '0xdd04ba0254972CC736F6966c496B4941f02BD816',
       AZUKI: '0x050Cd8082B86c5F469e0ba72ef4400E5E454886D',
+    },
+    [eEthereumNetwork.monad]: {
+      // empty until NFT collections are listed; CryptoPunks mocks deployed by migration
     },
     [eEthereumNetwork.main]: {
       WPUNKS: '0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6',
