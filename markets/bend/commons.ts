@@ -57,6 +57,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0x19Fc1F11e1BEA5317ce54d97bbf5675a38e2F4a3',
     [eEthereumNetwork.rinkeby]: '0xC019619F15aF1f96A695aBA39478e64ABcAa474b',
     [eEthereumNetwork.main]: '0x501c991E0D31D408c25bCf00da27BdF2759A394a',
+    [eEthereumNetwork.monad]: undefined,
   },
   ProxyAdminFund: {
     [eEthereumNetwork.coverage]: undefined,
@@ -66,6 +67,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0xd9E1e945e042fa29cD984cb0f280ae5Ce990D993',
     [eEthereumNetwork.rinkeby]: '0x64DA9D7651CA78caAB756740C6057e2b7B1E63De',
     [eEthereumNetwork.main]: '0x2A71a0F5cef1fFc519027AD12f19453110e70666',
+    [eEthereumNetwork.monad]: undefined,
   },
   ProxyAdminWTL: {
     [eEthereumNetwork.coverage]: undefined,
@@ -75,9 +77,11 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: "0x1055d0961CE2E1aF92f57b208171B90f8f1c7916",
     [eEthereumNetwork.rinkeby]: undefined,
     [eEthereumNetwork.main]: undefined,
+    [eEthereumNetwork.monad]: undefined,
   },
 
   // If PoolAdmin/emergencyAdmin is set, will take priority over PoolAdminIndex/emergencyAdminIndex
+  // For Monad with a single PRIVATE_KEY, set both to your deployer address before running migration.
   PoolAdmin: {
     [eEthereumNetwork.coverage]: undefined,
     [eEthereumNetwork.hardhat]: undefined,
@@ -86,6 +90,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6',
     [eEthereumNetwork.rinkeby]: '0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6',
     [eEthereumNetwork.main]: '0x868964fa49a6fd6e116FE82c8f4165904406f479',
+    [eEthereumNetwork.monad]: undefined,
   },
   PoolAdminIndex: 1,
   EmergencyAdmin: {
@@ -96,6 +101,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0xFc6a5b329340719b2693C2c74a5D056cf4f93FB0',
     [eEthereumNetwork.rinkeby]: '0xFc6a5b329340719b2693C2c74a5D056cf4f93FB0',
     [eEthereumNetwork.main]: '0x2CFa21b4dEc4409670899d05b8644e9C432250de',
+    [eEthereumNetwork.monad]: undefined,
   },
   EmergencyAdminIndex: 2,
 
@@ -107,6 +113,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0x37A76Db446bDB3EF1b73112a8D5E6868de06464f',
     [eEthereumNetwork.rinkeby]: '0xB873F088EB721261bc88BbC739B5C794e02e414b',
     [eEthereumNetwork.main]: '0x79d922DD382E42A156bC0A354861cDBC4F09110d',
+    [eEthereumNetwork.monad]: '',
   },
 
   ProviderRegistry: {
@@ -117,12 +124,14 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0x5eff819a886474503004d39C64b5c057FFD6fAe2',
     [eEthereumNetwork.rinkeby]: '0xE199f7a0173FEAfb8c0085b2724b544a7c614273',
     [eEthereumNetwork.main]: '0x2C16905Dfd953cf3BF3960c4A101c1eEBBd37E32',
+    [eEthereumNetwork.monad]: '',
   },
   ProviderRegistryOwner: {
     [eEthereumNetwork.sepolia]: '0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6',
     [eEthereumNetwork.goerli]: '0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6',
     [eEthereumNetwork.rinkeby]: '0xafF5C36642385b6c7Aaf7585eC785aB2316b5db6',
     [eEthereumNetwork.main]: '0x868964fa49a6fd6e116FE82c8f4165904406f479',
+    [eEthereumNetwork.monad]: undefined,
     [eEthereumNetwork.coverage]: '',
     [eEthereumNetwork.hardhat]: '',
     [eEthereumNetwork.localhost]: '',
@@ -136,6 +145,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0xFFC171ff66bba4303Ea8334d08dB5779daF860a3',
     [eEthereumNetwork.rinkeby]: '0xEEa5BC7BEB4DD341E8BBa230E22df9CA45f0AE19',
     [eEthereumNetwork.main]: '0x16ca3E500dA893cF2EEBb6b401247e68ca5BC072',
+    [eEthereumNetwork.monad]: undefined,
   },
   NFTOracle: {
     [eEthereumNetwork.coverage]: '',
@@ -145,11 +155,10 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0xE7E268cC1D025906fe8f6b076ecc40FF1a8dfA61',
     [eEthereumNetwork.rinkeby]: '0x04af5eF6100E1025560Be50FF244CB31f60d08c2',
     [eEthereumNetwork.main]: '0x7C2A19e54e48718f6C60908a9Cff3396E4Ea1eBA',
+    [eEthereumNetwork.monad]: undefined,
   },
 
   ReserveAggregators: {
-    // https://data.chain.link/ethereum/mainnet/crypto-eth
-    // https://docs.chain.link/docs/ethereum-addresses/
     [eEthereumNetwork.coverage]: {},
     [eEthereumNetwork.hardhat]: {},
     [eEthereumNetwork.localhost]: {
@@ -158,23 +167,24 @@ export const CommonsConfig: ICommonConfiguration = {
       USD: '0x6B8dcBD1bb131ED184221902df1Fe21019ccD7dc',
     },
     [eEthereumNetwork.sepolia]: {
-      USD: '0x694AA1769357215DE4FAC081bf1f309aDC325306', //ETH - USD
+      USD: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
     },
     [eEthereumNetwork.goerli]: {
-      USD: '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e', //ETH - USD
+      USD: '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e',
       USDT: '0xF82ced221150d59ac33D42bfc4b0f1ED845B2da6',
     },
     [eEthereumNetwork.rinkeby]: {
       DAI: '0x74825DbC8BF76CC4e9494d0ecB210f676Efa001D',
       USDC: '0xdCA36F27cbC4E38aE16C4E9f99D39b42337F6dcf',
-      USD: '0x8A753747A1Fa494EC906cE90E9f37563A8AF630e', //ETH - USD
+      USD: '0x8A753747A1Fa494EC906cE90E9f37563A8AF630e',
     },
     [eEthereumNetwork.main]: {
-      USD: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419', //ETH - USD
+      USD: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
       USDT: '0xEe9F2375b4bdF6387aa8265dD4FB8F16512A1d46',
       DAI: '0x773616E4d11A78F511299002da57A0a94577F1f4',
       USDC: '0x986b5E1e1755e3C2440e960477f25201B0a8bbD4',
     },
+    [eEthereumNetwork.monad]: {},
   },
   ReserveAssets: {
     [eEthereumNetwork.coverage]: {},
@@ -184,6 +194,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.rinkeby]: {},
     [eEthereumNetwork.goerli]: {},
     [eEthereumNetwork.sepolia]: {},
+    [eEthereumNetwork.monad]: {},
   },
   ReservesConfig: {},
   NftsAssets: {
@@ -194,36 +205,40 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.rinkeby]: {},
     [eEthereumNetwork.goerli]: {},
     [eEthereumNetwork.sepolia]: {},
+    [eEthereumNetwork.monad]: {},
   },
   NftsConfig: {},
 
-  WrappedNativeToken: { //WETH
-    [eEthereumNetwork.coverage]: '', // deployed in local evm
-    [eEthereumNetwork.hardhat]: '', // deployed in local evm
+  WrappedNativeToken: { //WETH / WMON on Monad
+    [eEthereumNetwork.coverage]: '',
+    [eEthereumNetwork.hardhat]: '',
     [eEthereumNetwork.localhost]: '0xB4B4ead1A260F1572b88b9D8ABa5A152D166c104',
     [eEthereumNetwork.sepolia]: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
     [eEthereumNetwork.goerli]: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     [eEthereumNetwork.rinkeby]: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
     [eEthereumNetwork.main]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    [eEthereumNetwork.monad]: '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A', // WMON
   },
 
   CryptoPunksMarket: {
-    [eEthereumNetwork.coverage]: '', // deployed in local evm
-    [eEthereumNetwork.hardhat]: '', // deployed in local evm
-    [eEthereumNetwork.localhost]: '0xb2f97A3c2E48cd368901657e31Faaa93035CE390',
+    [eEthereumNetwork.coverage]: '',
+    [eEthereumNetwork.hardhat]: '',
+    [eEthereumNetwork.localhost]: '0xb2f97A3c2E48cd36824615801BCeE0Df2eC390',
     [eEthereumNetwork.sepolia]: '0x554309B0888c37139D6E31aBAe30B4502915B5DB',
     [eEthereumNetwork.goerli]: '0xBccC7a1E79215EC3FD36824615801BCeE0Df2eC3',
     [eEthereumNetwork.rinkeby]: '0x6389eA3Cf6dE815ba76d7Cf4C6Db6A7093471bcb',
     [eEthereumNetwork.main]: '0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb',
+    [eEthereumNetwork.monad]: '', // migration deploys mock
   },
   WrappedPunkToken: {
-    [eEthereumNetwork.coverage]: '', // deployed in local evm
-    [eEthereumNetwork.hardhat]: '', // deployed in local evm
+    [eEthereumNetwork.coverage]: '',
+    [eEthereumNetwork.hardhat]: '',
     [eEthereumNetwork.localhost]: '0x5a60c5d89A0A0e08ae0CAe73453e3AcC9C335847',
     [eEthereumNetwork.sepolia]: '0x647dc527Bd7dFEE4DD468cE6fC62FC50fa42BD8b',
     [eEthereumNetwork.goerli]: '0xbeD1e8B430FD512b82A18cb121a8442F3889E505',
     [eEthereumNetwork.rinkeby]: '0x74e4418A41169Fb951Ca886976ccd8b36968c4Ab',
     [eEthereumNetwork.main]: '0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6',
+    [eEthereumNetwork.monad]: '', // migration deploys mock
   },
 
   ReserveFactorCollectorAddress: {
@@ -234,6 +249,7 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: '0x32B08f895d93a207e8A5C9405870D780A43b25Dd',
     [eEthereumNetwork.rinkeby]: '0x7A02EE743Aadca63d60945971B7eD12c7f26b6d2',
     [eEthereumNetwork.main]: '0x43078AbfB76bd24885Fd64eFFB22049f92a8c495',
+    [eEthereumNetwork.monad]: '0x0000000000000000000000000000000000000001',
   },
   IncentivesController: {
     [eEthereumNetwork.coverage]: ZERO_ADDRESS,
@@ -243,5 +259,6 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.goerli]: "0x292F693048208184320C01e0C223D624268e5EE7",
     [eEthereumNetwork.rinkeby]: '0xD800e97aE32b06C1e89ca5126c7bF6aEF89D6B24',
     [eEthereumNetwork.main]: '0x26FC1f11E612366d3367fc0cbFfF9e819da91C8d',
+    [eEthereumNetwork.monad]: ZERO_ADDRESS,
   },
 };
