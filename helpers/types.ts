@@ -14,6 +14,8 @@ export enum eEthereumNetwork {
   rinkeby = "rinkeby",
   sepolia = "sepolia",
   main = "main",
+  /** Monad mainnet — fully EVM compatible */
+  monad = "monad",
 }
 
 export enum BendPools {
@@ -52,10 +54,10 @@ export enum eContractid {
   InterestRate = "InterestRate",
   BendUpgradeableProxy = "BendUpgradeableProxy",
   BendProxyAdminTest = "BendProxyAdminTest",
-  BendProxyAdminPool = "BendProxyAdminPool", //LendPool Contracts, etc Oracle(Reserve, NFT)
-  BendProxyAdminFund = "BendProxyAdminFund", //Treasury Fundings, etc Collector
-  BendProxyAdminWTL = "BendProxyAdminWTL", //Common Proxy Admin Without Timelock
-  BendV2ProxyAdmin = "BendV2ProxyAdmin", //Common Proxy Admin in V2
+  BendProxyAdminPool = "BendProxyAdminPool",
+  BendProxyAdminFund = "BendProxyAdminFund",
+  BendProxyAdminWTL = "BendProxyAdminWTL",
+  BendV2ProxyAdmin = "BendV2ProxyAdmin",
   WalletBalanceProvider = "WalletBalanceProvider",
   BToken = "BToken",
   DebtToken = "DebtToken",
@@ -97,48 +99,37 @@ export enum eContractid {
 }
 
 export enum ProtocolLoanState {
-  // We need a default that is not 'Created' - this is the zero value
   None,
-  // The loan data is stored, but not initiated yet.
   Created,
-  // The loan has been initialized, funds have been delivered to the borrower and the collateral is held.
   Active,
-  // The loan has been auctioned, debt have been repaid to the pool and the collateral is held.
   Auction,
-  // The loan has been repaid, and the collateral has been returned to the borrower. This is a terminal state.
   Repaid,
-  // The loan was delinquent and collateral claimed by the liquidator. This is a terminal state.
   Defaulted,
 }
 
 export enum ProtocolErrors {
-  //common errors
-  CALLER_NOT_POOL_ADMIN = "100", // 'The caller must be the pool admin'
+  CALLER_NOT_POOL_ADMIN = "100",
   CALLER_NOT_ADDRESS_PROVIDER = "101",
   INVALID_FROM_BALANCE_AFTER_TRANSFER = "102",
   INVALID_TO_BALANCE_AFTER_TRANSFER = "103",
   CALLER_NOT_ONBEHALFOF_OR_IN_WHITELIST = "104",
   CALLER_NOT_RISK_ADMIN = "105",
   CALLER_NOT_RISK_OR_POOL_ADMIN = "106",
-
-  //math library erros
   MATH_MULTIPLICATION_OVERFLOW = "200",
   MATH_ADDITION_OVERFLOW = "201",
   MATH_DIVISION_BY_ZERO = "202",
-
-  //validation & check errors
-  VL_INVALID_AMOUNT = "301", // 'Amount must be greater than 0'
-  VL_NO_ACTIVE_RESERVE = "302", // 'Action requires an active reserve'
-  VL_RESERVE_FROZEN = "303", // 'Action cannot be performed because the reserve is frozen'
-  VL_NOT_ENOUGH_AVAILABLE_USER_BALANCE = "304", // 'User cannot withdraw more than the available balance'
-  VL_BORROWING_NOT_ENABLED = "305", // 'Borrowing is not enabled'
-  VL_COLLATERAL_BALANCE_IS_0 = "306", // 'The collateral balance is 0'
-  VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD = "307", // 'Health factor is lesser than the liquidation threshold'
-  VL_COLLATERAL_CANNOT_COVER_NEW_BORROW = "308", // 'There is not enough collateral to cover a new borrow'
-  VL_NO_DEBT_OF_SELECTED_TYPE = "309", // 'for repayment of stable debt, the user needs to have stable debt, otherwise, he needs to have variable debt'
+  VL_INVALID_AMOUNT = "301",
+  VL_NO_ACTIVE_RESERVE = "302",
+  VL_RESERVE_FROZEN = "303",
+  VL_NOT_ENOUGH_AVAILABLE_USER_BALANCE = "304",
+  VL_BORROWING_NOT_ENABLED = "305",
+  VL_COLLATERAL_BALANCE_IS_0 = "306",
+  VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD = "307",
+  VL_COLLATERAL_CANNOT_COVER_NEW_BORROW = "308",
+  VL_NO_DEBT_OF_SELECTED_TYPE = "309",
   VL_NO_ACTIVE_NFT = "310",
   VL_NFT_FROZEN = "311",
-  VL_SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER = "312", // 'User did not borrow the specified currency'
+  VL_SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER = "312",
   VL_INVALID_HEALTH_FACTOR = "313",
   VL_INVALID_ONBEHALFOF_ADDRESS = "314",
   VL_INVALID_TARGET_ADDRESS = "315",
@@ -146,10 +137,8 @@ export enum ProtocolErrors {
   VL_SPECIFIED_LOAN_NOT_BORROWED_BY_USER = "317",
   VL_SPECIFIED_RESERVE_NOT_BORROWED_BY_USER = "318",
   VL_PRICE_STALE = "320",
-
-  //lend pool errors
-  LP_CALLER_NOT_LEND_POOL_CONFIGURATOR = "400", // 'The caller of the function is not the lending pool configurator'
-  LP_IS_PAUSED = "401", // 'Pool is paused'
+  LP_CALLER_NOT_LEND_POOL_CONFIGURATOR = "400",
+  LP_IS_PAUSED = "401",
   LP_NO_MORE_RESERVES_ALLOWED = "402",
   LP_NOT_CONTRACT = "403",
   LP_BORROW_NOT_EXCEED_LIQUIDATION_THRESHOLD = "404",
@@ -169,8 +158,6 @@ export enum ProtocolErrors {
   LP_NFT_SUPPLY_NUM_EXCEED_MAX_LIMIT = "418",
   LP_CALLER_NOT_VALID_INTERCEPTOR = "419",
   LP_CALLER_NOT_VALID_LOCKER = "420",
-
-  //lend pool loan errors
   LPL_INVALID_LOAN_STATE = "480",
   LPL_INVALID_LOAN_AMOUNT = "481",
   LPL_INVALID_TAKEN_AMOUNT = "482",
@@ -186,29 +173,21 @@ export enum ProtocolErrors {
   LPL_INVALID_BIDDER_ADDRESS = "492",
   LPL_AMOUNT_LESS_THAN_BID_FINE = "493",
   LPL_BID_INVALID_BID_FINE = "494",
-
-  //common token errors
-  CT_CALLER_MUST_BE_LEND_POOL = "500", // 'The caller of this function must be a lending pool'
-  CT_INVALID_MINT_AMOUNT = "501", //invalid amount to mint
-  CT_INVALID_BURN_AMOUNT = "502", //invalid amount to burn
+  CT_CALLER_MUST_BE_LEND_POOL = "500",
+  CT_INVALID_MINT_AMOUNT = "501",
+  CT_INVALID_BURN_AMOUNT = "502",
   CT_BORROW_ALLOWANCE_NOT_ENOUGH = "503",
-
-  //reserve logic errors
-  RL_RESERVE_ALREADY_INITIALIZED = "601", // 'Reserve has already been initialized'
-  RL_LIQUIDITY_INDEX_OVERFLOW = "602", //  Liquidity index overflows uint128
-  RL_VARIABLE_BORROW_INDEX_OVERFLOW = "603", //  Variable borrow index overflows uint128
-  RL_LIQUIDITY_RATE_OVERFLOW = "604", //  Liquidity rate overflows uint128
-  RL_VARIABLE_BORROW_RATE_OVERFLOW = "605", //  Variable borrow rate overflows uint128
-
-  //configure errors
-  LPC_RESERVE_LIQUIDITY_NOT_0 = "700", // 'The liquidity of the reserve needs to be 0'
-  LPC_INVALID_CONFIGURATION = "701", // 'Invalid risk parameters for the reserve'
-  LPC_CALLER_NOT_EMERGENCY_ADMIN = "702", // 'The caller must be the emergency admin'
+  RL_RESERVE_ALREADY_INITIALIZED = "601",
+  RL_LIQUIDITY_INDEX_OVERFLOW = "602",
+  RL_VARIABLE_BORROW_INDEX_OVERFLOW = "603",
+  RL_LIQUIDITY_RATE_OVERFLOW = "604",
+  RL_VARIABLE_BORROW_RATE_OVERFLOW = "605",
+  LPC_RESERVE_LIQUIDITY_NOT_0 = "700",
+  LPC_INVALID_CONFIGURATION = "701",
+  LPC_CALLER_NOT_EMERGENCY_ADMIN = "702",
   LPC_INVALIED_BNFT_ADDRESS = "703",
   LPC_INVALIED_LOAN_ADDRESS = "704",
   LPC_NFT_LIQUIDITY_NOT_0 = "705",
-
-  //reserve config errors
   RC_INVALID_LTV = "730",
   RC_INVALID_LIQ_THRESHOLD = "731",
   RC_INVALID_LIQ_BONUS = "732",
@@ -217,28 +196,23 @@ export enum ProtocolErrors {
   RC_INVALID_REDEEM_DURATION = "735",
   RC_INVALID_AUCTION_DURATION = "736",
   RC_INVALID_REDEEM_FINE = "737",
-
-  //address provider erros
-  LPAPR_PROVIDER_NOT_REGISTERED = "760", // 'Provider is not registered'
+  LPAPR_PROVIDER_NOT_REGISTERED = "760",
   LPAPR_INVALID_ADDRESSES_PROVIDER_ID = "761",
-
-  // Misc errors
   INVALID_OWNER_REVERT_MSG = "Ownable: caller is not the owner",
   TRANSFER_AMOUNT_EXCEEDS_BALANCE = "ERC20: transfer amount exceeds balance",
   SAFEERC20_LOWLEVEL_CALL = "SafeERC20: low-level call failed",
 }
 
 export type tEthereumAddress = string;
-export type tStringTokenBigUnits = string; // 1 ETH, or 10e6 USDC or 10e18 DAI
+export type tStringTokenBigUnits = string;
 export type tBigNumberTokenBigUnits = BigNumber;
-export type tStringTokenSmallUnits = string; // 1 wei, or 1 basic unit of USDC, or 1 basic unit of DAI
+export type tStringTokenSmallUnits = string;
 export type tBigNumberTokenSmallUnits = BigNumber;
 
 export interface iAssetCommon<T> {
   [key: string]: T;
 }
 export interface iAssetBase<T> {
-  //BUSD: T;
   WETH: T;
   DAI: T;
   USDC: T;
@@ -246,28 +220,15 @@ export interface iAssetBase<T> {
 }
 
 export type iAssetsWithoutETH<T> = Omit<iAssetBase<T>, "ETH">;
-
 export type iAssetsWithoutUSD<T> = Omit<iAssetBase<T>, "USD">;
-
-export type iBendPoolAssets<T> = Pick<
-  iAssetsWithoutUSD<T>,
-  | "WETH"
-  | "DAI"
-  //| 'BUSD'
-  | "USDC"
-  | "USDT"
->;
-
+export type iBendPoolAssets<T> = Pick<iAssetsWithoutUSD<T>, "WETH" | "DAI" | "USDC" | "USDT">;
 export type iMultiPoolsAssets<T> = iAssetCommon<T> | iBendPoolAssets<T>;
-
 export type iBendPoolTokens<T> = Omit<iBendPoolAssets<T>, "ETH">;
-
 export type iAssetAggregatorBase<T> = iAssetsWithoutETH<T>;
 
 export enum TokenContractId {
   WETH = "WETH",
   DAI = "DAI",
-  //BUSD = 'BUSD',
   USDC = "USDC",
   USDT = "USDT",
 }
@@ -287,9 +248,7 @@ export interface iNftBase<T> {
 }
 
 export type iMultiPoolsNfts<T> = iNftCommon<T> | iBendPoolNfts<T>;
-
 export type iBendPoolNfts<T> = iNftBase<T>;
-
 export type iNftAggregatorBase<T> = iNftBase<T>;
 
 export enum NftContractId {
@@ -360,6 +319,7 @@ export interface iEthereumParamsPerNetwork<T> {
   [eEthereumNetwork.rinkeby]: T;
   [eEthereumNetwork.sepolia]: T;
   [eEthereumNetwork.main]: T;
+  [eEthereumNetwork.monad]: T;
 }
 
 export interface iParamsPerPool<T> {
@@ -395,43 +355,32 @@ export interface ICommonConfiguration {
   BTokenSymbolPrefix: string;
   DebtTokenNamePrefix: string;
   DebtTokenSymbolPrefix: string;
-
   ProviderId: number;
   ProtocolGlobalParams: IProtocolGlobalConfig;
   Mocks: IMocksConfig;
-
   ProxyAdminPool: iParamsPerNetwork<tEthereumAddress | undefined>;
   ProxyAdminFund: iParamsPerNetwork<tEthereumAddress | undefined>;
   ProxyAdminWTL: iParamsPerNetwork<tEthereumAddress | undefined>;
-
   BNFTRegistry: iParamsPerNetwork<tEthereumAddress | undefined>;
-
   ProviderRegistry: iParamsPerNetwork<tEthereumAddress | undefined>;
   ProviderRegistryOwner: iParamsPerNetwork<tEthereumAddress | undefined>;
-
   ReserveOracle: iParamsPerNetwork<tEthereumAddress | undefined>;
   NFTOracle: iParamsPerNetwork<tEthereumAddress | undefined>;
-
   PoolAdmin: iParamsPerNetwork<tEthereumAddress | undefined>;
   PoolAdminIndex: number;
   EmergencyAdmin: iParamsPerNetwork<tEthereumAddress | undefined>;
   EmergencyAdminIndex: number;
-
   ReserveAggregators: iParamsPerNetwork<ITokenAddress>;
   ReserveAssets: iParamsPerNetwork<SymbolMap<tEthereumAddress>>;
   ReservesConfig: iMultiPoolsAssets<IReserveParams>;
   NftsAssets: iParamsPerNetwork<SymbolMap<tEthereumAddress>>;
   NftsConfig: iMultiPoolsNfts<INftParams>;
-
   WrappedNativeToken: iParamsPerNetwork<tEthereumAddress>;
-
   CryptoPunksMarket: iParamsPerNetwork<tEthereumAddress>;
   WrappedPunkToken: iParamsPerNetwork<tEthereumAddress>;
-
   ReserveFactorCollectorAddress: iParamsPerNetwork<tEthereumAddress>;
   IncentivesController: iParamsPerNetwork<tEthereumAddress>;
   DebtTokenImplementation?: iParamsPerNetwork<tEthereumAddress>;
-
   OracleQuoteCurrency: string;
   OracleQuoteUnit: string;
 }

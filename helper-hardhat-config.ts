@@ -16,10 +16,10 @@ export const buildForkConfig = (): HardhatNetworkForkingUserConfig | undefined =
   let forkMode;
   if (FORK) {
     forkMode = {
-      url: NETWORKS_RPC_URL[FORK],
+      url: NETWORKS_RPC_URL[FORK as eEthereumNetwork],
     };
-    if (FORK_BLOCK_NUMBER || BLOCK_TO_FORK[FORK]) {
-      forkMode.blockNumber = FORK_BLOCK_NUMBER || BLOCK_TO_FORK[FORK];
+    if (FORK_BLOCK_NUMBER || BLOCK_TO_FORK[FORK as eEthereumNetwork]) {
+      forkMode.blockNumber = FORK_BLOCK_NUMBER || BLOCK_TO_FORK[FORK as eEthereumNetwork];
     }
   }
   return forkMode;
@@ -38,6 +38,7 @@ export const NETWORKS_RPC_URL: iParamsPerNetwork<string> = {
   [eEthereumNetwork.main]: ALCHEMY_KEY
     ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`
     : `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+  [eEthereumNetwork.monad]: process.env.MONAD_RPC_URL || "https://rpc.monad.xyz",
   [eEthereumNetwork.coverage]: "http://localhost:8555",
   [eEthereumNetwork.hardhat]: "http://localhost:8545",
   [eEthereumNetwork.localhost]: "http://localhost:8545",
@@ -48,6 +49,7 @@ export const NETWORKS_DEFAULT_GAS: iParamsPerNetwork<number> = {
   [eEthereumNetwork.goerli]: 65 * GWEI,
   [eEthereumNetwork.rinkeby]: 65 * GWEI,
   [eEthereumNetwork.main]: 5 * GWEI,
+  [eEthereumNetwork.monad]: 50 * GWEI,
   [eEthereumNetwork.coverage]: 65 * GWEI,
   [eEthereumNetwork.hardhat]: 65 * GWEI,
   [eEthereumNetwork.localhost]: 65 * GWEI,
@@ -58,6 +60,7 @@ export const BLOCK_TO_FORK: iParamsPerNetwork<number | undefined> = {
   [eEthereumNetwork.rinkeby]: 0,
   [eEthereumNetwork.goerli]: 0,
   [eEthereumNetwork.sepolia]: 0,
+  [eEthereumNetwork.monad]: 0,
   [eEthereumNetwork.coverage]: 0,
   [eEthereumNetwork.hardhat]: 0,
   [eEthereumNetwork.localhost]: 0,
