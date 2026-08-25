@@ -1,82 +1,68 @@
-/* ==========================================================================
-   DESIGN TOKENS — fixed reference system
-   Hardcoded values. Import this file, then override per-project as needed.
-   ========================================================================== */
+/* Lender design tokens — Stripe mesh palette */
 
 :root {
-  /* ---- Color: core ---- */
-  --indigo:              #533AFD;
-  --navy-ink:             #0D253D;
-  --cream:                #FFF9F0;
-  --sherbet-orange:       #FFB088;
-  --lavender:             #C4B5FD;
-  --ruby-pink:            #F472B6;
+  --indigo: #533afd;
+  --indigo-bright: #7c5cff;
+  --navy-ink: #0d253d;
+  --cream: #fff9f0;
+  --sherbet-orange: #ffb088;
+  --lavender: #c4b5fd;
+  --ruby-pink: #f472b6;
 
-  /* ---- Color: dark mode ---- */
-  --dark-bg:              #0A0E17;
-  --dark-surface:         #151A24;
-  --dark-surface-raised:  #1B2130;
-  --dark-text-primary:    #F5F6F8;
-  --dark-text-secondary:  #9AA3B2;
+  --light-surface: #ffffff;
+  --light-surface-sunken: #fbf7ef;
+  --light-text-primary: var(--navy-ink);
+  --light-text-secondary: #5b6b7c;
+  --on-primary: #fff9f0;
+  --ok: #15803d;
+  --err: #b42318;
 
-  /* ---- Color: light mode ---- */
-  --light-surface:        #FFFFFF;
-  --light-surface-sunken: #FBF7EF;
-  --light-text-primary:   var(--navy-ink);
-  --light-text-secondary: #5B6B7C;
+  --border-subtle-light: rgba(13, 37, 61, 0.08);
 
-  /* ---- Borders ---- */
-  --border-subtle-dark:   rgba(255, 255, 255, 0.08);
-  --border-subtle-light:  rgba(13, 37, 61, 0.08);
-
-  /* ---- Gradients ---- */
   --gradient-hero-light: linear-gradient(
     135deg,
-    #FFF9F0 0%,
-    #FFB088 25%,
-    #C4B5FD 55%,
-    #533AFD 80%,
-    #F472B6 100%
+    #fff9f0 0%,
+    #ffb088 25%,
+    #c4b5fd 55%,
+    #533afd 80%,
+    #f472b6 100%
   );
-
-  --gradient-app-dark: radial-gradient(
-    ellipse at top left,
-    #1A1530 0%,
-    #0A0E17 60%
+  --gradient-hero-soft: linear-gradient(
+    135deg,
+    #fff9f0 0%,
+    color-mix(in srgb, #ffb088 70%, #fff9f0) 25%,
+    color-mix(in srgb, #c4b5fd 58%, #fff9f0) 55%,
+    color-mix(in srgb, #533afd 34%, #fff9f0) 80%,
+    color-mix(in srgb, #f472b6 48%, #fff9f0) 100%
   );
+  --gradient-cta: linear-gradient(90deg, #533afd 0%, #7c5cff 100%);
 
-  --gradient-cta: linear-gradient(90deg, #533AFD 0%, #7C5CFF 100%);
-
-  /* ---- Spacing scale (8px base unit) ---- */
   --space-1: 8px;
   --space-2: 16px;
   --space-3: 24px;
   --space-4: 32px;
   --space-6: 48px;
   --space-8: 64px;
-  --space-12: 96px;
 
-  /* ---- Layout ---- */
-  --container-max: 1200px;
-  --gutter-mobile: 24px;
-  --gutter-desktop: 64px;
-  --grid-columns: 12;
-  --grid-gap: 24px;
+  --container-max: 1120px;
+  --gutter-mobile: 20px;
+  --gutter-desktop: 32px;
 
-  /* ---- Radius ---- */
   --radius-sm: 8px;
-  --radius-md: 16px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-pill: 9999px;
 
-  /* ---- Type ---- */
-  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --font-display: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", monospace;
   --font-weight-display: 300;
   --font-weight-body: 400;
   --font-weight-medium: 500;
-  --letter-spacing-heading: -0.02em;
+  --letter-spacing-heading: -0.03em;
 
-  --text-xs: 12px;
+  --text-caption: 12px;
+  --text-mini: 13px;
   --text-sm: 14px;
   --text-base: 16px;
   --text-lg: 20px;
@@ -84,79 +70,180 @@
   --text-2xl: 40px;
   --text-3xl: 56px;
 
-  /* ---- Motion ---- */
+  --shadow-border:
+    0px 0px 0px 1px rgba(13, 37, 61, 0.06),
+    0px 1px 2px -1px rgba(13, 37, 61, 0.06),
+    0px 2px 4px 0px rgba(13, 37, 61, 0.04);
+  --shadow-border-hover:
+    0px 0px 0px 1px rgba(13, 37, 61, 0.1),
+    0px 1px 2px -1px rgba(13, 37, 61, 0.08),
+    0px 2px 4px 0px rgba(13, 37, 61, 0.06);
+  --shadow-cta: 0 1px 2px rgba(83, 58, 253, 0.22),
+    0 8px 24px -8px rgba(83, 58, 253, 0.45);
+  --shadow-lift: 0 18px 50px -18px rgba(13, 37, 61, 0.22);
+  --shadow-input:
+    0 0 0 1px color-mix(in srgb, var(--indigo) 55%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--indigo) 14%, transparent);
+
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --duration-fast: 150ms;
   --duration-base: 250ms;
-  --duration-slow: 400ms;
 }
 
-.hero-gradient {
-  background: var(--gradient-hero-light);
-}
-
-.hero-gradient--skewed {
-  transform: skewY(-8deg);
+.mesh-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 920px;
+  z-index: 0;
+  pointer-events: none;
   overflow: hidden;
+  background: var(--cream);
 }
 
-.app-bg-dark {
-  background: var(--gradient-app-dark);
-  color: var(--dark-text-primary);
+.mesh-band {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  top: -32%;
+  height: 84%;
+  transform: skewY(-8deg);
+  background: var(--gradient-hero-soft);
 }
+
+.mesh-token-wash {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-hero-light);
+  opacity: 0.32;
+  mix-blend-mode: screen;
+}
+
+.mesh-blobs {
+  position: absolute;
+  inset: 0;
+}
+
+.mesh-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(88px);
+  will-change: transform;
+}
+
+.mesh-blob-a {
+  width: 58%;
+  height: 72%;
+  left: -10%;
+  top: 0;
+  background: var(--sherbet-orange);
+  opacity: 0.7;
+  animation: mesh-drift-a 22s ease-in-out infinite alternate;
+}
+
+.mesh-blob-b {
+  width: 52%;
+  height: 64%;
+  left: 26%;
+  top: -12%;
+  background: var(--lavender);
+  opacity: 0.62;
+  animation: mesh-drift-b 26s ease-in-out infinite alternate;
+}
+
+.mesh-blob-c {
+  width: 50%;
+  height: 68%;
+  right: -12%;
+  top: 4%;
+  background: var(--indigo);
+  opacity: 0.22;
+  animation: mesh-drift-c 24s ease-in-out infinite alternate;
+}
+
+.mesh-blob-d {
+  width: 42%;
+  height: 52%;
+  left: 46%;
+  top: 28%;
+  background: var(--ruby-pink);
+  opacity: 0.42;
+  animation: mesh-drift-d 20s ease-in-out infinite alternate;
+}
+
+.mesh-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 38%,
+    color-mix(in srgb, var(--cream) 40%, transparent) 58%,
+    color-mix(in srgb, var(--cream) 82%, transparent) 78%,
+    var(--cream) 92%
+  );
+}
+
+.mesh-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(13, 37, 61, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 37, 61, 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+  transform: perspective(720px) rotateX(52deg) scale(1.38);
+  transform-origin: center top;
+  mask-image: radial-gradient(ellipse 92% 52% at 50% 0%, #000 12%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 92% 52% at 50% 0%, #000 12%, transparent 70%);
+  opacity: 0.55;
+}
+
+.mesh-noise {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+@keyframes mesh-drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(5%, 4%, 0) scale(1.08); }
+}
+@keyframes mesh-drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-4%, 6%, 0) scale(1.06); }
+}
+@keyframes mesh-drift-c {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-6%, -3%, 0) scale(1.1); }
+}
+@keyframes mesh-drift-d {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(4%, -5%, 0) scale(1.07); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-blob { animation: none; }
+}
+
+.hero-gradient { background: var(--gradient-hero-light); }
+.hero-gradient--skewed { transform: skewY(-8deg); overflow: hidden; }
 
 .container {
   max-width: var(--container-max);
   margin: 0 auto;
   padding: 0 var(--gutter-mobile);
 }
-
 @media (min-width: 1024px) {
-  .container {
-    padding: 0 var(--gutter-desktop);
-  }
-}
-
-.grid-12 {
-  display: grid;
-  grid-template-columns: repeat(var(--grid-columns), 1fr);
-  gap: var(--grid-gap);
-}
-
-.card-dark {
-  background: var(--dark-surface);
-  border: 1px solid var(--border-subtle-dark);
-  border-radius: var(--radius-md);
-}
-
-.card-light {
-  background: var(--light-surface);
-  border: 1px solid var(--border-subtle-light);
-  border-radius: var(--radius-md);
-}
-
-.btn-primary {
-  background: var(--gradient-cta);
-  color: white;
-  border-radius: var(--radius-pill);
-  font-weight: var(--font-weight-medium);
-  padding: var(--space-2) var(--space-3);
-  border: none;
-  transition: opacity var(--duration-fast) var(--ease-standard);
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-}
-
-h1, h2, h3 {
-  font-family: var(--font-display);
-  font-weight: var(--font-weight-display);
-  letter-spacing: var(--letter-spacing-heading);
-  font-feature-settings: "ss01";
+  .container { padding: 0 var(--gutter-desktop); }
 }
 
 .mono-numeric {
   font-family: var(--font-mono);
   font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
 }

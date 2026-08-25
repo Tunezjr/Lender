@@ -1,15 +1,16 @@
-import { config, shortAddress } from "./config.js";
+import { config, shortAddress, DEMO_WALLET } from "./config.js";
 
 let address = null;
+let kind = null;
 const listeners = new Set();
 
 function emit() {
-  listeners.forEach((fn) => fn({ address, short: shortAddress(address) }));
+  listeners.forEach((fn) => fn({ address, short: shortAddress(address), kind }));
 }
 
 export function onWalletChange(fn) {
   listeners.add(fn);
-  fn({ address, short: shortAddress(address) });
+  fn({ address, short: shortAddress(address), kind });
   return () => listeners.delete(fn);
 }
 
@@ -49,13 +50,17 @@ export async function ensureMonad() {
 }
 
 export async function connectWallet() {
-  if (!window.ethereum) {
-    throw new Error("No wallet found. Install MetaMask.");
+  if (window.ethereum) {
+    await ensureMonad();
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    if (!accounts?.length) throw new Error("No account returned");
+    address = accounts[0];
+    kind = "injected";
+    emit();
+    return address;
   }
-  await ensureMonad();
-  const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-  if (!accounts?.length) throw new Error("No account returned");
-  address = accounts[0];
+  address = DEMO_WALLET;
+  kind = "demo";
   emit();
   return address;
 }
@@ -66,6 +71,7 @@ export async function silentConnect() {
     const accounts = await window.ethereum.request({ method: "eth_accounts" });
     if (accounts?.length) {
       address = accounts[0];
+      kind = "injected";
       emit();
     }
   } catch {
@@ -76,6 +82,7 @@ export async function silentConnect() {
 
 export function disconnectWallet() {
   address = null;
+  kind = null;
   emit();
 }
 
@@ -83,6 +90,7 @@ export function bindWalletListeners() {
   if (!window.ethereum?.on) return;
   window.ethereum.on("accountsChanged", (accounts) => {
     address = accounts?.[0] || null;
+    kind = address ? "injected" : null;
     emit();
   });
   window.ethereum.on("chainChanged", () => {

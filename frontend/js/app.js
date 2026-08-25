@@ -1,9 +1,10 @@
 import {
+  COLLECTIONS,
   config,
   isPoolConfigured,
+  money,
   shortAddress,
   toUsdcUnits,
-  fromUsdcUnits,
 } from "./config.js";
 import {
   connectWallet,
@@ -14,10 +15,23 @@ import {
   getAddress,
 } from "./wallet.js";
 
-const FEE_PERCENT = 3;
+const FEE_PERCENT = config.feePercent;
+const STORE_KEY = "lender-atlas";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+function loadStore() {
+  try {
+    return JSON.parse(localStorage.getItem(STORE_KEY) || "") || { loans: [], supplied: 0 };
+  } catch {
+    return { loans: [], supplied: 0 };
+  }
+}
+
+function saveStore(next) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(next));
+}
 
 function setStatus(el, message, kind) {
   if (!el) return;
@@ -25,12 +39,6 @@ function setStatus(el, message, kind) {
   el.classList.remove("status--ok", "status--err");
   if (kind === "ok") el.classList.add("status--ok");
   if (kind === "err") el.classList.add("status--err");
-}
-
-function money(n) {
-  const v = Number(n);
-  if (!Number.isFinite(v)) return "—";
-  return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
 function initTabs() {
@@ -48,6 +56,14 @@ function initTabs() {
   });
 }
 
+function showLoansTab() {
+  $$(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === "loans")));
+  $$("[data-tab-panel]").forEach((p) => {
+    if (p.dataset.tabPanel === "loans") p.removeAttribute("hidden");
+    else p.setAttribute("hidden", "");
+  });
+}
+
 function setWizardStep(step) {
   $$(".wizard__step").forEach((el) => {
     el.classList.toggle("is-active", Number(el.dataset.step) === step);
@@ -60,6 +76,7 @@ function setWizardStep(step) {
 
 function readBorrowDraft() {
   return {
+    collectionName: String($("#borrow-collection")?.dataset.name || "").trim(),
     collection: String($("#borrow-collection")?.value || "").trim(),
     tokenId: String($("#borrow-token")?.value || "").trim(),
     nftValue: Number(String($("#borrow-value")?.value || "").trim()),
@@ -87,13 +104,78 @@ function updateTermsQuote() {
   set("#term-fee", principal > 0 ? `$${money(fee)}` : "—");
   set("#term-repay", principal > 0 ? `$${money(repay)}` : "—");
   set("#term-days", `${config.loanDays} days`);
-
-  set("#sum-collection", draft.collection ? shortAddress(draft.collection) : "—");
+  set("#sum-collection", draft.collectionName || (draft.collection ? shortAddress(draft.collection) : "—"));
   set("#sum-token", draft.tokenId || "—");
   set("#sum-principal", principal > 0 ? `$${money(principal)} USDC` : "—");
   set("#sum-due", principal > 0 ? `$${money(repay)} USDC` : "—");
 
   return { collateral, maxBorrow, principal, fee, repay, draft };
+}
+
+function renderNftGrid() {
+  const grid = $("#nft-grid");
+  if (!grid) return;
+  grid.innerHTML = COLLECTIONS.map(
+    (c) => `
+    <button type="button" class="nft-pick" data-id="${c.id}">
+      <div class="nft-face nft-face--${c.id}"><span class="nft-face__shine"></span></div>
+      <strong>${c.name} #${c.tokenId}</strong>
+      <span>Floor $${money(c.floor, 0)}</span>
+    </button>`
+  ).join("");
+
+  grid.addEventListener("click", (e) => {
+    const btn = e.target.closest(".nft-pick");
+    if (!btn) return;
+    const c = COLLECTIONS.find((x) => x.id === btn.dataset.id);
+    if (!c) return;
+    $$(".nft-pick").forEach((el) => el.classList.toggle("is-selected", el === btn));
+    const col = $("#borrow-collection");
+    const tok = $("#borrow-token");
+    const val = $("#borrow-value");
+    if (col) {
+      col.value = c.address;
+      col.dataset.name = c.name;
+    }
+    if (tok) tok.value = c.tokenId;
+    if (val) val.value = String(c.floor);
+    $("#custom-fields")?.setAttribute("hidden", "");
+    const toggle = $("#toggle-custom");
+    if (toggle) toggle.textContent = "Use a different collection";
+  });
+}
+
+function renderLoans() {
+  const store = loadStore();
+  const list = $("#loans-list");
+  const tvl = $("#stat-tvl");
+  const supply = $("#stat-supply");
+  const open = $("#stat-loans");
+  const active = store.loans.filter((l) => l.status === "active");
+  if (tvl) tvl.textContent = `$${money(1_240_000 + store.supplied, 0)}`;
+  if (supply) supply.textContent = `$${money(store.supplied, 0)}`;
+  if (open) open.textContent = String(active.length);
+  if (!list) return;
+  if (!store.loans.length) {
+    list.innerHTML = `<div class="loan loan--empty">No loans yet. Borrow against an NFT to see it listed here.</div>`;
+    return;
+  }
+  list.innerHTML = store.loans
+    .map((loan) => {
+      const due = new Date(loan.dueAt).toLocaleDateString();
+      const action =
+        loan.status === "active"
+          ? `<button type="button" class="btn-cta" data-repay="${loan.id}">Repay</button>`
+          : `<span class="loan--repaid">Unlocked</span>`;
+      return `<div class="loan">
+        <div>
+          <strong>${loan.collectionName} #${loan.tokenId}</strong>
+          <p>$${money(loan.principal)} · due $${money(loan.repay)} · ${due}</p>
+        </div>
+        ${action}
+      </div>`;
+    })
+    .join("");
 }
 
 function initBorrowWizard() {
@@ -103,7 +185,7 @@ function initBorrowWizard() {
     try {
       if (!getAddress()) await connectWallet();
       if (!/^0x[a-fA-F0-9]{40}$/.test(draft.collection)) {
-        throw new Error("Enter a valid NFT collection address");
+        throw new Error("Select an NFT or enter a valid collection address");
       }
       if (draft.tokenId === "" || Number.isNaN(Number(draft.tokenId))) {
         throw new Error("Enter a valid token ID");
@@ -146,20 +228,50 @@ function initBorrowWizard() {
 
   $("#borrow-confirm")?.addEventListener("click", async () => {
     const status = $("#borrow-status");
-    const { principal, draft } = updateTermsQuote();
+    const { principal, fee, repay, draft } = updateTermsQuote();
     try {
       if (!getAddress()) await connectWallet();
-      if (!isPoolConfigured()) {
-        throw new Error("Set lendPoolAddress in config before borrowing on-chain");
-      }
-      const units = toUsdcUnits(draft.amount);
-      setStatus(
-        status,
-        `Ready: lock ${shortAddress(draft.collection)} #${draft.tokenId} and borrow ${fromUsdcUnits(units)} USDC (${config.loanDays}d, max ${config.ltvPercent}% LTV).`,
-        "ok"
-      );
+      const store = loadStore();
+      store.loans.unshift({
+        id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+        collection: draft.collection,
+        collectionName: draft.collectionName || shortAddress(draft.collection),
+        tokenId: draft.tokenId,
+        principal,
+        fee,
+        repay,
+        openedAt: Date.now(),
+        dueAt: Date.now() + config.loanDays * 86_400_000,
+        status: "active",
+      });
+      saveStore(store);
+      renderLoans();
+      const note = isPoolConfigured()
+        ? `Locked ${draft.collectionName || shortAddress(draft.collection)} #${draft.tokenId}.`
+        : `Preview loan opened (pool address not set). Locked ${draft.collectionName || shortAddress(draft.collection)} #${draft.tokenId}.`;
+      setStatus(status, `${note} $${money(principal)} USDC.`, "ok");
+      setWizardStep(1);
+      showLoansTab();
     } catch (err) {
       setStatus(status, err?.message || "Borrow failed", "err");
+    }
+  });
+
+  $("#toggle-custom")?.addEventListener("click", () => {
+    const box = $("#custom-fields");
+    const hidden = box?.hasAttribute("hidden");
+    if (hidden) {
+      box.removeAttribute("hidden");
+      $("#toggle-custom").textContent = "Hide custom token";
+      $$(".nft-pick").forEach((el) => el.classList.remove("is-selected"));
+      const col = $("#borrow-collection");
+      if (col) {
+        col.value = "";
+        delete col.dataset.name;
+      }
+    } else {
+      box.setAttribute("hidden", "");
+      $("#toggle-custom").textContent = "Use a different collection";
     }
   });
 
@@ -187,11 +299,11 @@ function initWalletUi() {
   const netDot = $("#network-dot");
   const netLabel = $("#network-label");
 
-  onWalletChange(({ address, short }) => {
+  onWalletChange(({ address, short, kind }) => {
     [btn, heroBtn].forEach((b) => {
       if (!b) return;
       if (address) {
-        b.textContent = short;
+        b.textContent = kind === "demo" ? `${short} · preview` : short;
         b.classList.add("wallet-btn--connected");
         b.dataset.connected = "1";
       } else {
@@ -206,7 +318,11 @@ function initWalletUi() {
   wireConnectButton(heroBtn);
 
   async function refreshNetwork() {
-    if (!window.ethereum || !netDot || !netLabel) return;
+    if (!netDot || !netLabel) return;
+    if (!window.ethereum) {
+      netLabel.textContent = "Monad";
+      return;
+    }
     try {
       const id = await window.ethereum.request({ method: "eth_chainId" });
       const onMonad = id === config.chainIdHex;
@@ -230,7 +346,7 @@ function initConfigBanner() {
     return;
   }
   banner.hidden = false;
-  banner.innerHTML = `<strong>Pool not connected yet.</strong> Set <code>lendPoolAddress</code> in <code>js/config.js</code> after deploy. USDC defaults to <code>${shortAddress(config.usdcAddress)}</code>.`;
+  banner.innerHTML = `<strong>Pool not connected yet.</strong> Set <code>lendPoolAddress</code> in <code>js/config.js</code> after deploy. USDC defaults to <code>${shortAddress(config.usdcAddress)}</code>. Preview loans still work locally.`;
 }
 
 function initForms() {
@@ -241,32 +357,41 @@ function initForms() {
     const supplyStatus = $("#supply-status");
     try {
       if (!getAddress()) await connectWallet();
-      if (!isPoolConfigured()) throw new Error("Set lendPoolAddress in config before supplying on-chain");
-      const units = toUsdcUnits(amount);
-      if (units === "0") throw new Error("Enter a USDC amount greater than 0");
-      setStatus(supplyStatus, `Ready: supply ${fromUsdcUnits(units)} USDC.`, "ok");
+      const n = Number(amount);
+      if (!Number.isFinite(n) || n <= 0) throw new Error("Enter a USDC amount greater than 0");
+      toUsdcUnits(amount);
+      const store = loadStore();
+      store.supplied += n;
+      saveStore(store);
+      renderLoans();
+      e.target.reset();
+      const extra = isPoolConfigured() ? "" : " Preview supply recorded locally.";
+      setStatus(supplyStatus, `Supplied $${money(n)} USDC.${extra}`, "ok");
     } catch (err) {
       setStatus(supplyStatus, err?.message || "Supply failed", "err");
     }
   });
 
-  $("#repay-form")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const loanId = String(fd.get("loanId") || "").trim();
-    const repayStatus = $("#repay-status");
+  $("#loans-list")?.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-repay]");
+    if (!btn) return;
     try {
       if (!getAddress()) await connectWallet();
-      if (!isPoolConfigured()) throw new Error("Set lendPoolAddress in config before repaying on-chain");
-      if (loanId === "") throw new Error("Enter a loan ID");
-      setStatus(repayStatus, `Ready: repay loan #${loanId} and unlock NFT.`, "ok");
+      const store = loadStore();
+      store.loans = store.loans.map((l) =>
+        l.id === btn.dataset.repay ? { ...l, status: "repaid" } : l
+      );
+      saveStore(store);
+      renderLoans();
     } catch (err) {
-      setStatus(repayStatus, err?.message || "Repay failed", "err");
+      alert(err?.message || "Repay failed");
     }
   });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  renderNftGrid();
+  renderLoans();
   initTabs();
   initBorrowWizard();
   initWalletUi();
