@@ -3,7 +3,7 @@
  * Override at runtime via window.__LENDER_CONFIG__ before modules load.
  */
 const defaults = {
-  lendPoolAddress: "",
+  lendPoolAddress: "0xc779850835B7C6872f7B2893A4d4A2cCf3733F15",
   usdcAddress: "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
   chainId: 143,
   chainIdHex: "0x8f",
