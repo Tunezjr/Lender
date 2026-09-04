@@ -26,24 +26,27 @@ export const DEMO_WALLET = "0xA11CE00000000000000000000000000000C0FFEE";
 
 export const COLLECTIONS = [
   {
-    id: "molandaks",
-    name: "Molandaks",
-    address: "0x36982448e77658b8f58f4665696e3173d1e696c2",
+    id: "skrumpeys",
+    name: "skrumpeys",
+    address: "0xb0dad798c80e40dd6b8e8545074c6a5b7b97d2c0",
     tokenId: "",
-    floorMon: 400,
-    floorUsd: 12.4,
+    floorMon: 3099,
+    floorUsd: 84,
     items: 3333,
-    opensea: "https://opensea.io/collection/molandaks-monad",
+    live: true,
+    opensea: "https://opensea.io/collection/skrumpeys",
   },
   {
-    id: "chewy",
-    name: "Chewy",
-    address: "0xe1ddf619bb352e6eb25367be99606be02836cbbc",
+    id: "chog",
+    name: "Chog",
+    // REPLACE after Chog mints — paste the official Monad ERC-721 address here
+    address: "",
     tokenId: "",
-    floorMon: 64.6,
-    floorUsd: 1.72,
-    items: 2448,
-    opensea: "https://opensea.io/collection/chewy-monad",
+    floorMon: 0,
+    floorUsd: 0,
+    items: 0,
+    live: false,
+    opensea: "",
   },
 ];
 

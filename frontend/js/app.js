@@ -136,10 +136,10 @@ function renderNftGrid() {
   if (!grid) return;
   grid.innerHTML = COLLECTIONS.map(
     (c) => `
-    <button type="button" class="nft-pick" data-id="${c.id}">
+    <button type="button" class="nft-pick${c.live ? "" : " nft-pick--soon"}" data-id="${c.id}" ${c.live ? "" : "disabled"}>
       <div class="nft-face nft-face--${c.id}"><span class="nft-face__shine"></span></div>
       <strong>${c.name}</strong>
-      <span>${c.items.toLocaleString()} items · ${c.floorMon} MON</span>
+      <span>${c.live ? `${c.items.toLocaleString()} items · ${c.floorMon.toLocaleString()} MON` : "Mints in ~24h · address TBA"}</span>
     </button>`
   ).join("");
 
@@ -147,7 +147,7 @@ function renderNftGrid() {
     const btn = e.target.closest(".nft-pick");
     if (!btn) return;
     const c = COLLECTIONS.find((x) => x.id === btn.dataset.id);
-    if (!c) return;
+    if (!c || !c.live || !c.address) return;
     $$(".nft-pick").forEach((el) => el.classList.toggle("is-selected", el === btn));
     const col = $("#borrow-collection");
     const tok = $("#borrow-token");

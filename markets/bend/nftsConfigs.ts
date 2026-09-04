@@ -88,6 +88,19 @@ export const strategyNft_CHEWY: INftParams = {
   maxTokenId: "99999",
 };
 
+export const strategyNft_SKRUMPEYS: INftParams = {
+  ...strategyNftClassC,
+  maxSupply: "3333",
+  maxTokenId: "99999",
+};
+
+export const strategyNft_CHOG: INftParams = {
+  ...strategyNftClassC,
+  maxSupply: "0",
+  maxTokenId: "0",
+};
+
+
 export const strategyNft_BAYC: INftParams = {
   ...strategyNftClassB,
   maxSupply: "10000",

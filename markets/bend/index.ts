@@ -22,6 +22,8 @@ import {
   strategyNft_WPUNKS,
   strategyNft_MOLANDAKS,
   strategyNft_CHEWY,
+  strategyNft_SKRUMPEYS,
+  strategyNft_CHOG,
 } from './nftsConfigs';
 
 // ----------------
@@ -49,6 +51,8 @@ export const BendConfig: IBendConfiguration = {
     WKODA: strategyNft_WKODA,
     MOLANDAKS: strategyNft_MOLANDAKS,
     CHEWY: strategyNft_CHEWY,
+    SKRUMPEYS: strategyNft_SKRUMPEYS,
+    CHOG: strategyNft_CHOG,
   },
   ReserveAssets: {
     [eEthereumNetwork.hardhat]: {},
@@ -115,8 +119,8 @@ export const BendConfig: IBendConfiguration = {
       AZUKI: '0x050Cd8082B86c5F469e0ba72ef4400E5E454886D',
     },
     [eEthereumNetwork.monad]: {
-      MOLANDAKS: '0x36982448e77658b8f58f4665696e3173d1e696c2',
-      CHEWY: '0xe1ddf619bb352e6eb25367be99606be02836cbbc',
+      SKRUMPEYS: '0xb0dad798c80e40dd6b8e8545074c6a5b7b97d2c0',
+      // CHOG: paste official mint address after launch
     },
     [eEthereumNetwork.main]: {
       WPUNKS: '0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6',
