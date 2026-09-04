@@ -76,6 +76,18 @@ export const strategyNft_WPUNKS: INftParams = {
   maxTokenId: "9999",
 };
 
+export const strategyNft_MOLANDAKS: INftParams = {
+  ...strategyNftClassC,
+  maxSupply: "3333",
+  maxTokenId: "99999",
+};
+
+export const strategyNft_CHEWY: INftParams = {
+  ...strategyNftClassC,
+  maxSupply: "2448",
+  maxTokenId: "99999",
+};
+
 export const strategyNft_BAYC: INftParams = {
   ...strategyNftClassB,
   maxSupply: "10000",

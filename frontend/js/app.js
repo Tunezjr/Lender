@@ -33,6 +33,25 @@ function saveStore(next) {
   localStorage.setItem(STORE_KEY, JSON.stringify(next));
 }
 
+async function assertOwnsNft(collection, tokenId) {
+  const owner = getAddress();
+  if (!owner) throw new Error("Connect a Monad wallet first");
+  if (!window.ethereum) throw new Error("No wallet found");
+  const tokenHex = BigInt(tokenId).toString(16).padStart(64, "0");
+  const data = `0x6352211e${tokenHex}`;
+  const raw = await window.ethereum.request({
+    method: "eth_call",
+    params: [{ to: collection, data }, "latest"],
+  });
+  if (!raw || raw === "0x") {
+    throw new Error("That token ID is not minted on this collection");
+  }
+  const tokenOwner = `0x${raw.slice(-40)}`;
+  if (tokenOwner.toLowerCase() !== owner.toLowerCase()) {
+    throw new Error("Connected wallet does not own that token");
+  }
+}
+
 function setStatus(el, message, kind) {
   if (!el) return;
   el.textContent = message || "";
@@ -119,8 +138,8 @@ function renderNftGrid() {
     (c) => `
     <button type="button" class="nft-pick" data-id="${c.id}">
       <div class="nft-face nft-face--${c.id}"><span class="nft-face__shine"></span></div>
-      <strong>${c.name} #${c.tokenId}</strong>
-      <span>Floor $${money(c.floor, 0)}</span>
+      <strong>${c.name}</strong>
+      <span>${c.items.toLocaleString()} items · ${c.floorMon} MON</span>
     </button>`
   ).join("");
 
@@ -137,11 +156,11 @@ function renderNftGrid() {
       col.value = c.address;
       col.dataset.name = c.name;
     }
-    if (tok) tok.value = c.tokenId;
-    if (val) val.value = String(c.floor);
-    $("#custom-fields")?.setAttribute("hidden", "");
+    if (tok) tok.value = "";
+    if (val) val.value = String(c.floorUsd);
+    $("#custom-fields")?.removeAttribute("hidden");
     const toggle = $("#toggle-custom");
-    if (toggle) toggle.textContent = "Use a different collection";
+    if (toggle) toggle.textContent = "Hide token fields";
   });
 }
 
@@ -152,7 +171,7 @@ function renderLoans() {
   const supply = $("#stat-supply");
   const open = $("#stat-loans");
   const active = store.loans.filter((l) => l.status === "active");
-  if (tvl) tvl.textContent = `$${money(1_240_000 + store.supplied, 0)}`;
+  if (tvl) tvl.textContent = `$${money(store.supplied, 0)}`;
   if (supply) supply.textContent = `$${money(store.supplied, 0)}`;
   if (open) open.textContent = String(active.length);
   if (!list) return;
@@ -185,14 +204,15 @@ function initBorrowWizard() {
     try {
       if (!getAddress()) await connectWallet();
       if (!/^0x[a-fA-F0-9]{40}$/.test(draft.collection)) {
-        throw new Error("Select an NFT or enter a valid collection address");
+        throw new Error("Select a listed collection or enter a valid contract");
       }
       if (draft.tokenId === "" || Number.isNaN(Number(draft.tokenId))) {
-        throw new Error("Enter a valid token ID");
+        throw new Error("Enter the token ID you actually own");
       }
       if (!Number.isFinite(draft.nftValue) || draft.nftValue <= 0) {
         throw new Error("Enter an estimated NFT value greater than 0");
       }
+      await assertOwnsNft(draft.collection, draft.tokenId);
       setStatus(status, "", null);
       updateTermsQuote();
       setWizardStep(2);

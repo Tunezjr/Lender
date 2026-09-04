@@ -26,25 +26,24 @@ export const DEMO_WALLET = "0xA11CE00000000000000000000000000000C0FFEE";
 
 export const COLLECTIONS = [
   {
-    id: "helix",
-    name: "Helix",
-    address: "0x8f3C2A91E04B7d6eA1C5b0C4F2D9E8A7B6C5D4E3",
-    tokenId: "8812",
-    floor: 2400,
+    id: "molandaks",
+    name: "Molandaks",
+    address: "0x36982448e77658b8f58f4665696e3173d1e696c2",
+    tokenId: "",
+    floorMon: 400,
+    floorUsd: 12.4,
+    items: 3333,
+    opensea: "https://opensea.io/collection/molandaks-monad",
   },
   {
-    id: "sorbets",
-    name: "Sorbets",
-    address: "0x2B14D7A0C9E8F3B1A5D6C7E9F001223344556677",
-    tokenId: "42",
-    floor: 860,
-  },
-  {
-    id: "vault",
-    name: "Vault Keys",
-    address: "0xA01B23C45D67E89F01A2B3C4D5E6F70819283746",
-    tokenId: "7",
-    floor: 1500,
+    id: "chewy",
+    name: "Chewy",
+    address: "0xe1ddf619bb352e6eb25367be99606be02836cbbc",
+    tokenId: "",
+    floorMon: 64.6,
+    floorUsd: 1.72,
+    items: 2448,
+    opensea: "https://opensea.io/collection/chewy-monad",
   },
 ];
 

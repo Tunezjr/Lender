@@ -438,22 +438,17 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   position: relative;
   overflow: hidden;
 }
-.nft-face--helix {
+.nft-face--molandaks {
   background:
     radial-gradient(circle at 20% 20%, #c4b5fd 0%, transparent 42%),
     radial-gradient(circle at 80% 30%, #533afd 0%, transparent 48%),
     linear-gradient(160deg, #0d253d 0%, #533afd 100%);
 }
-.nft-face--sorbets {
+.nft-face--chewy {
   background:
     radial-gradient(circle at 30% 30%, #fff9f0 0%, transparent 36%),
-    radial-gradient(circle at 78% 24%, #f472b6 0%, transparent 44%),
-    linear-gradient(135deg, #ffb088 0%, #f472b6 70%, #c4b5fd 100%);
-}
-.nft-face--vault {
-  background:
-    radial-gradient(circle at 50% 20%, #c4b5fd 0%, transparent 40%),
-    linear-gradient(180deg, #0d253d 0%, #533afd 100%);
+    radial-gradient(circle at 78% 24%, #ffb088 0%, transparent 44%),
+    linear-gradient(135deg, #f472b6 0%, #533afd 70%, #0d253d 100%);
 }
 .nft-face__shine {
   position: absolute;

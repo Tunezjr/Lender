@@ -20,6 +20,8 @@ import {
   strategyNft_WKODA,
   strategyNft_WOW,
   strategyNft_WPUNKS,
+  strategyNft_MOLANDAKS,
+  strategyNft_CHEWY,
 } from './nftsConfigs';
 
 // ----------------
@@ -45,6 +47,8 @@ export const BendConfig: IBendConfiguration = {
     CLONEX: strategyNft_CLONEX,
     AZUKI: strategyNft_AZUKI,
     WKODA: strategyNft_WKODA,
+    MOLANDAKS: strategyNft_MOLANDAKS,
+    CHEWY: strategyNft_CHEWY,
   },
   ReserveAssets: {
     [eEthereumNetwork.hardhat]: {},
@@ -111,7 +115,8 @@ export const BendConfig: IBendConfiguration = {
       AZUKI: '0x050Cd8082B86c5F469e0ba72ef4400E5E454886D',
     },
     [eEthereumNetwork.monad]: {
-      // empty until NFT collections are listed; CryptoPunks mocks deployed by migration
+      MOLANDAKS: '0x36982448e77658b8f58f4665696e3173d1e696c2',
+      CHEWY: '0xe1ddf619bb352e6eb25367be99606be02836cbbc',
     },
     [eEthereumNetwork.main]: {
       WPUNKS: '0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6',
