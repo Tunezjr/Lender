@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./css/design-tokens.css" />
     <link rel="stylesheet" href="./css/app.css" />
+    <link rel="stylesheet" href="./css/ticker.css" />
   </head>
   <body>
     <div class="mesh-stage" aria-hidden="true">
@@ -107,28 +108,28 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             </div>
             <h3>Instant USDC payout</h3>
-            <p>Get USDC the moment your NFT is locked — no waiting on approvals or underwriting.</p>
+            <div class="scroll-line" data-line="Get USDC the moment your NFT is locked — no waiting on approvals or underwriting."></div>
           </article>
           <article class="benefit">
             <div class="benefit__icon" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <h3>Non-custodial by design</h3>
-            <p>Collateral sits in a smart contract, never in a company wallet — you're the only one who can reclaim it.</p>
+            <div class="scroll-line" data-line="Collateral sits in a smart contract, never in a company wallet — you're the only one who can reclaim it."></div>
           </article>
           <article class="benefit">
             <div class="benefit__icon" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M9 8h6"/><path d="M10 12h4"/><path d="M6 21V8a6 6 0 0 1 12 0v13"/></svg>
             </div>
             <h3>Built for Monad speed</h3>
-            <p>Sub-second finality means loans open and close as fast as you can sign.</p>
+            <div class="scroll-line" data-line="Sub-second finality means loans open and close as fast as you can sign."></div>
           </article>
           <article class="benefit">
             <div class="benefit__icon" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
             </div>
             <h3>No credit checks</h3>
-            <p>Your NFT is the collateral. Nothing else about you is reviewed or required.</p>
+            <div class="scroll-line" data-line="Your NFT is the collateral. Nothing else about you is reviewed or required."></div>
           </article>
         </div>
       </section>
@@ -141,17 +142,17 @@
           <article class="how__step">
             <span class="how__num">1</span>
             <h3>Connect your wallet</h3>
-            <p>Connect your wallet and select an NFT worth more than the amount you want to borrow. It stays safely in escrow.</p>
+            <div class="scroll-line" data-line="Connect your wallet and select an NFT worth more than the amount you want to borrow. It stays safely in escrow."></div>
           </article>
           <article class="how__step">
             <span class="how__num">2</span>
             <h3>Lock your NFT</h3>
-            <p>Principal, fee, total owed, and loan-to-value are all shown on-chain before you confirm anything.</p>
+            <div class="scroll-line" data-line="Principal, fee, total owed, and loan-to-value are all shown on-chain before you confirm anything."></div>
           </article>
           <article class="how__step">
             <span class="how__num">3</span>
             <h3>Receive USDC instantly</h3>
-            <p>Confirm the loan terms and USDC lands in your wallet right away — no credit checks, no waiting.</p>
+            <div class="scroll-line" data-line="Confirm the loan terms and USDC lands in your wallet right away — no credit checks, no waiting."></div>
           </article>
         </div>
       </section>
@@ -162,15 +163,15 @@
         <div class="security-grid">
           <article class="security-card">
             <h3>Non-custodial escrow</h3>
-            <p>Collateral sits in protocol contracts. Only you can repay and unlock — no admin key can seize your NFT while terms are met.</p>
+            <div class="scroll-line" data-line="Collateral sits in protocol contracts. Only you can repay and unlock — no admin key can seize your NFT while terms are met."></div>
           </article>
           <article class="security-card">
             <h3>Transparent terms</h3>
-            <p>LTV, fee, principal, and due date are visible before you sign. Nothing is hidden off-chain.</p>
+            <div class="scroll-line" data-line="LTV, fee, principal, and due date are visible before you sign. Nothing is hidden off-chain."></div>
           </article>
           <article class="security-card">
             <h3>Clear default path</h3>
-            <p>Repaid on time → NFT returns to you. Unpaid past due date → NFT releases to the lender per contract rules.</p>
+            <div class="scroll-line" data-line="Repaid on time → NFT returns to you. Unpaid past due date → NFT releases to the lender per contract rules."></div>
           </article>
         </div>
       </section>
@@ -297,32 +298,44 @@
         <h2 class="section-title">Frequently asked questions</h2>
         <details class="faq__item">
           <summary>Which wallets are supported?</summary>
-          <p>MetaMask, Coinbase Wallet, Rabby, and any standard browser wallet that supports Monad. This UI also offers a local preview wallet.</p>
+          <div class="scroll-line" data-line="MetaMask, Coinbase Wallet, Rabby, and any standard browser wallet that supports Monad. This UI also offers a local preview wallet."></div>
         </details>
         <details class="faq__item">
           <summary>What is the maximum LTV?</summary>
-          <p>30% of the NFT’s value. You cannot borrow more than that.</p>
+          <div class="scroll-line" data-line="30% of the NFT’s value. You cannot borrow more than that."></div>
         </details>
         <details class="faq__item">
           <summary>How long is a loan?</summary>
-          <p>Fixed 7-day terms. Repay early anytime to unlock the NFT.</p>
+          <div class="scroll-line" data-line="Fixed 7-day terms. Repay early anytime to unlock the NFT."></div>
         </details>
         <details class="faq__item">
           <summary>Are there any fees?</summary>
-          <p>A 3% fee is shown on the loan terms screen before you confirm.</p>
+          <div class="scroll-line" data-line="A 3% fee is shown on the loan terms screen before you confirm."></div>
         </details>
         <details class="faq__item">
           <summary>What happens if I don't repay?</summary>
-          <p>Repaid on time → NFT returns to you. Unpaid past due date → NFT releases to the lender per escrow rules.</p>
+          <div class="scroll-line" data-line="Repaid on time → NFT returns to you. Unpaid past due date → NFT releases to the lender per escrow rules."></div>
         </details>
         <details class="faq__item">
           <summary>Is my NFT ever at risk from a hack or admin action?</summary>
-          <p>Collateral is held in non-custodial contracts. There is no company wallet holding your NFT.</p>
+          <div class="scroll-line" data-line="Collateral is held in non-custodial contracts. There is no company wallet holding your NFT."></div>
         </details>
       </section>
     </main>
 
     <footer class="site-footer">Lender · NFT-backed USDC credit · Monad</footer>
     <script type="module" src="./js/app.js"></script>
+  
+    <script>
+      document.querySelectorAll(".scroll-line").forEach((el, i) => {
+        const line = el.getAttribute("data-line") || el.textContent.trim();
+        if (!line) return;
+        const track = document.createElement("div");
+        track.className = "ticker-track" + (i % 2 ? " ticker-track--rev" : "") + " ticker-track--slow";
+        track.innerHTML = Array.from({ length: 8 }, () => "<span>" + line.replace(/</g, "") + "</span>").join("");
+        el.replaceChildren(track);
+      });
+    </script>
+
   </body>
 </html>
