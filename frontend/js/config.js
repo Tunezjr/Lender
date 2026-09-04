@@ -11,6 +11,8 @@ const defaults = {
   rpcUrl: "https://rpc.monad.xyz",
   explorerUrl: "https://monadvision.com",
   nativeCurrency: { name: "MON", symbol: "MON", decimals: 18 },
+  // WalletConnect Cloud project ID; override through window.__LENDER_CONFIG__ in production.
+  walletConnectProjectId: "429370f458176860b6462c5c0aa74886",
   ltvPercent: 30,
   loanDays: 7,
   usdcDecimals: 6,
@@ -53,6 +55,13 @@ export const COLLECTIONS = [
 export function isPoolConfigured() {
   return Boolean(
     config.lendPoolAddress && /^0x[a-fA-F0-9]{40}$/.test(config.lendPoolAddress)
+  );
+}
+
+export function isWalletConnectConfigured() {
+  return Boolean(
+    config.walletConnectProjectId &&
+      config.walletConnectProjectId !== "YOUR_WALLETCONNECT_PROJECT_ID"
   );
 }
 

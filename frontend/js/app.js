@@ -8,6 +8,7 @@ import {
 } from "./config.js";
 import {
   connectWallet,
+  connectWalletConnect,
   silentConnect,
   disconnectWallet,
   onWalletChange,
@@ -303,10 +304,13 @@ function wireConnectButton(btn) {
   btn.addEventListener("click", async () => {
     try {
       if (btn.dataset.connected) {
-        disconnectWallet();
+        await disconnectWallet();
         return;
       }
-      await connectWallet();
+      // Browser wallets remain the default. Without an injected provider the
+      // same button opens WalletConnect's QR modal for mobile/desktop wallets.
+      if (window.ethereum) await connectWallet();
+      else await connectWalletConnect();
     } catch (e) {
       alert(e?.message || "Wallet connection failed");
     }
