@@ -22,7 +22,6 @@ import {
 } from "./wallet.js";
 import {
   assertOwnsNft,
-  borrowUsdc,
   explorerTx,
   readBUsdcBalance,
   readDebt,
@@ -30,6 +29,14 @@ import {
   repayLoan,
   supplyUsdc,
 } from "./pool.js";
+import {
+  borrowFromVault,
+  createOrOpenVault,
+  fundVaultForGas,
+  loadVaultRecord,
+  transferNftToVault,
+  waitUntilVaultOwns,
+} from "./vault.js";
 
 const POS_KEY = "lender-positions";
 
@@ -143,6 +150,8 @@ function updateTermsQuote() {
   text($("#sum-token"), draft.tokenId || "—");
   text($("#sum-principal"), principal > 0 ? `$${money(principal)} USDC` : "—");
   text($("#sum-due"), principal > 0 ? `$${money(repay)} USDC` : "—");
+  const vault = loadVaultRecord();
+  text($("#sum-vault"), vault?.address ? shortAddress(vault.address) : "Not created");
   return { maxBorrow, maxRaw, principal, fee, repay, draft };
 }
 
@@ -240,7 +249,7 @@ function renderLoans() {
     title.textContent = `${pos.collectionName || shortAddress(pos.collection)} #${pos.tokenId}`;
     const detail = document.createElement("p");
     detail.textContent = pos.hash
-      ? `Borrow tx ${pos.hash.slice(0, 10)}…`
+      ? `${pos.vault ? `Vault ${shortAddress(pos.vault)} · ` : ""}Borrow tx ${pos.hash.slice(0, 10)}…`
       : "Awaiting chain read";
     info.append(title, detail);
     row.append(info);
@@ -327,26 +336,58 @@ function initBorrowWizard() {
   $("#borrow-confirm")?.addEventListener("click", async () => {
     const status = $("#borrow-status");
     const { principal, draft } = updateTermsQuote();
+    let secret = null;
     try {
       if (!getAddress()) await connectWallet();
-      setStatus(status, "Confirm the NFT approval and borrow in your wallet…");
-      const result = await borrowUsdc(draft.collection, draft.tokenId, principal);
+      setStatus(status, "Create or unlock the Mera vault with your passkey…");
+      const opened = await createOrOpenVault();
+      secret = opened.secret;
+      text($("#sum-vault"), shortAddress(opened.address));
+      setStatus(
+        status,
+        opened.reused
+          ? `Vault ${shortAddress(opened.address)} unlocked. Transfer the NFT in…`
+          : `Vault ${shortAddress(opened.address)} created. Transfer the NFT in…`
+      );
+      const moved = await transferNftToVault(
+        draft.collection,
+        draft.tokenId,
+        opened.address
+      );
+      if (moved.hash) {
+        setStatus(status, `NFT sent to vault. ${explorerTx(moved.hash)}`);
+      }
+      setStatus(status, "Waiting for the vault to hold the NFT…");
+      await waitUntilVaultOwns(draft.collection, draft.tokenId, opened.address);
+      setStatus(status, "Funding vault gas if needed…");
+      await fundVaultForGas(opened.address);
+      setStatus(status, "Originating the loan from the vault…");
+      const result = await borrowFromVault({
+        secret,
+        vaultAddress: opened.address,
+        collection: draft.collection,
+        tokenId: draft.tokenId,
+        amountHuman: principal,
+      });
       savePosition({
         collection: draft.collection,
         collectionName: draft.collectionName || shortAddress(draft.collection),
         tokenId: draft.tokenId,
-        hash: result.borrow.hash,
+        vault: opened.address,
+        hash: result.borrow,
       });
       renderLoans();
       setStatus(
         status,
-        `Borrow submitted. ${explorerTx(result.borrow.hash)}`,
+        `Loan opened from vault ${shortAddress(opened.address)}. ${explorerTx(result.borrow)}`,
         "ok"
       );
       setWizardStep(1);
       showLoansTab();
     } catch (err) {
-      setStatus(status, err?.message || "Borrow transaction failed", "err");
+      setStatus(status, err?.message || "Vault borrow failed", "err");
+    } finally {
+      if (secret) secret.fill(0);
     }
   });
 
