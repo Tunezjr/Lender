@@ -120,7 +120,7 @@ export const BendConfig: IBendConfiguration = {
     },
     [eEthereumNetwork.monad]: {
       SKRUMPEYS: '0xb0dad798c80e40dd6b8e8545074c6a5b7b97d2c0',
-      // CHOG: paste official mint address after launch
+      CHOG: '0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763',
     },
     [eEthereumNetwork.main]: {
       WPUNKS: '0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6',

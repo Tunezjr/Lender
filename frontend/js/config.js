@@ -40,15 +40,14 @@ export const COLLECTIONS = [
   },
   {
     id: "chog",
-    name: "Chog",
-    // REPLACE after Chog mints — paste the official Monad ERC-721 address here
-    address: "",
+    name: "Chog Genesis",
+    address: "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
     tokenId: "",
-    floorMon: 0,
-    floorUsd: 0,
-    items: 0,
-    live: false,
-    opensea: "",
+    floorMon: 11800,
+    floorUsd: 290,
+    items: 1454,
+    live: true,
+    opensea: "https://opensea.io/collection/chog-genesis",
   },
 ];
 

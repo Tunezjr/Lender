@@ -176,7 +176,10 @@
     "address": "0xEA71Da4335e804089Db71A97bc0A7dc66FA118f6"
   },
   "NftChog": {
-    "address": "",
-    "note": "REPLACE after Chog mint"
+    "address": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+    "note": "OpenSea chog-genesis"
+  },
+  "BNFTChog": {
+    "address": "0xb29C16535b58193C78211711B5a2930Ab4bA7ED7"
   }
 }
