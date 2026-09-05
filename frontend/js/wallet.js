@@ -1,12 +1,7 @@
-import {
-  config,
-  isWalletConnectConfigured,
-  shortAddress,
-} from "./config.js";
+import { config, shortAddress } from "./config.js";
 
 let address = null;
 let provider = null;
-let walletConnectProvider = null;
 const listeners = new Set();
 
 function emit() {
@@ -23,8 +18,8 @@ export function getAddress() {
   return address;
 }
 
-function getInjectedProvider() {
-  return window.ethereum || null;
+export function getProvider() {
+  return provider || window.ethereum || null;
 }
 
 function bindProviderListeners(nextProvider) {
@@ -43,47 +38,9 @@ function bindProviderListeners(nextProvider) {
   });
 }
 
-async function getWalletConnectProvider() {
-  if (walletConnectProvider) return walletConnectProvider;
-  if (!isWalletConnectConfigured()) {
-    throw new Error(
-      "WalletConnect is not configured. Set walletConnectProjectId in the Lender runtime config."
-    );
-  }
-
-  let EthereumProvider;
-  try {
-    ({ EthereumProvider } = await import(
-      "https://esm.sh/@walletconnect/ethereum-provider@2.21.1"
-    ));
-  } catch {
-    throw new Error("Unable to load WalletConnect. Check your connection and try again.");
-  }
-
-  walletConnectProvider = await EthereumProvider.init({
-    projectId: config.walletConnectProjectId,
-    chains: [config.chainId],
-    optionalChains: [config.chainId],
-    showQrModal: true,
-    rpcMap: { [config.chainId]: config.rpcUrl },
-    metadata: {
-      name: "Lender",
-      description: "NFT-backed USDC credit on Monad",
-      url: window.location.origin,
-      icons: [`${window.location.origin}/favicon.ico`],
-    },
-  });
-  bindProviderListeners(walletConnectProvider);
-  return walletConnectProvider;
-}
-
-export function getProvider() {
-  return provider || getInjectedProvider();
-}
-
 export async function ensureMonad(walletProvider = getProvider()) {
   if (!walletProvider) {
-    throw new Error("No wallet found. Install a browser wallet or connect with WalletConnect.");
+    throw new Error("No wallet found. Install a Monad-ready browser wallet.");
   }
   try {
     await walletProvider.request({
@@ -91,7 +48,7 @@ export async function ensureMonad(walletProvider = getProvider()) {
       params: [{ chainId: config.chainIdHex }],
     });
   } catch (err) {
-    if (err?.code === 4902 && walletProvider !== walletConnectProvider) {
+    if (err?.code === 4902) {
       await walletProvider.request({
         method: "wallet_addEthereumChain",
         params: [
@@ -106,8 +63,6 @@ export async function ensureMonad(walletProvider = getProvider()) {
       });
     } else if (err?.code === 4001) {
       throw new Error("Switch to Monad in your wallet to continue.");
-    } else if (walletProvider === walletConnectProvider) {
-      throw new Error("Reconnect with a WalletConnect wallet that supports Monad.");
     } else {
       throw err;
     }
@@ -115,11 +70,13 @@ export async function ensureMonad(walletProvider = getProvider()) {
 }
 
 export async function connectWallet() {
-  const injectedProvider = getInjectedProvider();
-  if (!injectedProvider) {
-    return connectWalletConnect();
+  const injected = window.ethereum;
+  if (!injected) {
+    throw new Error(
+      "No injected wallet. WalletConnect is disabled until the production domain is verified in WalletConnect Cloud and the client is bundled locally."
+    );
   }
-  provider = injectedProvider;
+  provider = injected;
   bindProviderListeners(provider);
   await ensureMonad(provider);
   const accounts = await provider.request({ method: "eth_requestAccounts" });
@@ -130,24 +87,16 @@ export async function connectWallet() {
 }
 
 export async function connectWalletConnect() {
-  provider = await getWalletConnectProvider();
-  await provider.connect();
-  const accounts = await provider.request({ method: "eth_accounts" });
-  if (!accounts?.length) throw new Error("No account returned from WalletConnect");
-  const chainId = await provider.request({ method: "eth_chainId" });
-  if (chainId?.toLowerCase() !== config.chainIdHex.toLowerCase()) {
-    throw new Error("Reconnect with a WalletConnect wallet set to Monad.");
-  }
-  address = accounts[0];
-  emit();
-  return address;
+  throw new Error(
+    "WalletConnect is off until the live domain is allowlisted and the provider is bundled. Use a browser wallet on Monad."
+  );
 }
 
 export async function silentConnect() {
   try {
-    const injectedProvider = getInjectedProvider();
-    if (!injectedProvider) return null;
-    provider = injectedProvider;
+    const injected = window.ethereum;
+    if (!injected) return null;
+    provider = injected;
     bindProviderListeners(provider);
     const accounts = await provider.request({ method: "eth_accounts" });
     if (accounts?.length) {
@@ -161,17 +110,17 @@ export async function silentConnect() {
 }
 
 export async function disconnectWallet() {
-  const activeProvider = provider;
   address = null;
   provider = null;
   emit();
-  if (activeProvider === walletConnectProvider?.provider && walletConnectProvider?.disconnect) {
-    await walletConnectProvider.disconnect();
-  } else if (activeProvider === walletConnectProvider && walletConnectProvider?.disconnect) {
-    await walletConnectProvider.disconnect();
-  }
 }
 
 export function bindWalletListeners() {
   bindProviderListeners(getProvider());
+}
+
+export async function readChainId() {
+  const p = getProvider();
+  if (!p) return null;
+  return p.request({ method: "eth_chainId" });
 }

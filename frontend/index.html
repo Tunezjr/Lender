@@ -6,6 +6,8 @@
     <title>Lender — Borrow against your NFTs</title>
     <meta name="description" content="Lock an NFT and receive USDC in seconds. Max 30% LTV. Fixed 7-day terms on Monad." />
     <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="./favicon.ico" sizes="any" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -218,8 +220,8 @@
                   <input id="borrow-token" name="tokenId" placeholder="42" inputmode="numeric" />
                 </div>
                 <div class="field">
-                  <label for="borrow-value">Estimated NFT value (USD)</label>
-                  <input id="borrow-value" name="nftValue" placeholder="1000" inputmode="decimal" />
+                  <label for="borrow-value">Pool max borrow (USDC)</label>
+                  <input id="borrow-value" name="nftValue" placeholder="Read from pool" inputmode="decimal" readonly />
                 </div>
               </div>
               <button type="button" class="btn-primary" id="borrow-to-terms">Continue to loan terms</button>

@@ -1,57 +1,64 @@
 import {
   COLLECTIONS,
+  DUST,
   config,
-  isPoolConfigured,
+  fromUsdcUnits,
+  isHexAddress,
+  isTokenId,
   money,
   shortAddress,
-  toUsdcUnits,
+  verifyPool,
 } from "./config.js";
 import { readDustLock } from "./vedust.js";
 import {
   connectWallet,
-  connectWalletConnect,
   silentConnect,
   disconnectWallet,
   onWalletChange,
   bindWalletListeners,
   getAddress,
+  getProvider,
+  readChainId,
 } from "./wallet.js";
+import {
+  assertOwnsNft,
+  borrowUsdc,
+  explorerTx,
+  readBUsdcBalance,
+  readDebt,
+  readPoolQuote,
+  repayLoan,
+  supplyUsdc,
+} from "./pool.js";
 
-const FEE_PERCENT = config.feePercent;
-const STORE_KEY = "lender-atlas";
+const POS_KEY = "lender-positions";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-function loadStore() {
+function loadPositions() {
   try {
-    return JSON.parse(localStorage.getItem(STORE_KEY) || "") || { loans: [], supplied: 0 };
+    const raw = JSON.parse(localStorage.getItem(POS_KEY) || "[]");
+    return Array.isArray(raw) ? raw : [];
   } catch {
-    return { loans: [], supplied: 0 };
+    return [];
   }
 }
 
-function saveStore(next) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(next));
+function savePosition(pos) {
+  const next = loadPositions().filter(
+    (p) =>
+      !(
+        p.collection?.toLowerCase() === pos.collection.toLowerCase() &&
+        p.tokenId === pos.tokenId
+      )
+  );
+  next.unshift(pos);
+  localStorage.setItem(POS_KEY, JSON.stringify(next.slice(0, 25)));
 }
 
-async function assertOwnsNft(collection, tokenId) {
-  const owner = getAddress();
-  if (!owner) throw new Error("Connect a Monad wallet first");
-  if (!window.ethereum) throw new Error("No wallet found");
-  const tokenHex = BigInt(tokenId).toString(16).padStart(64, "0");
-  const data = `0x6352211e${tokenHex}`;
-  const raw = await window.ethereum.request({
-    method: "eth_call",
-    params: [{ to: collection, data }, "latest"],
-  });
-  if (!raw || raw === "0x") {
-    throw new Error("That token ID is not minted on this collection");
-  }
-  const tokenOwner = `0x${raw.slice(-40)}`;
-  if (tokenOwner.toLowerCase() !== owner.toLowerCase()) {
-    throw new Error("Connected wallet does not own that token");
-  }
+function text(el, value) {
+  if (el) el.textContent = value == null ? "" : String(value);
 }
 
 function setStatus(el, message, kind) {
@@ -60,6 +67,17 @@ function setStatus(el, message, kind) {
   el.classList.remove("status--ok", "status--err");
   if (kind === "ok") el.classList.add("status--ok");
   if (kind === "err") el.classList.add("status--err");
+}
+
+function rpcPublic(req) {
+  return fetch(config.rpcUrl, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, ...req }),
+  }).then((r) => r.json()).then((j) => {
+    if (j.error) throw new Error(j.error.message);
+    return j.result;
+  });
 }
 
 function initTabs() {
@@ -100,125 +118,164 @@ function readBorrowDraft() {
     collectionName: String($("#borrow-collection")?.dataset.name || "").trim(),
     collection: String($("#borrow-collection")?.value || "").trim(),
     tokenId: String($("#borrow-token")?.value || "").trim(),
-    nftValue: Number(String($("#borrow-value")?.value || "").trim()),
     amount: String($("#borrow-amount")?.value || "").trim(),
   };
 }
 
 function updateTermsQuote() {
   const draft = readBorrowDraft();
-  const collateral = Number.isFinite(draft.nftValue) ? draft.nftValue : 0;
-  const maxBorrow = (collateral * config.ltvPercent) / 100;
+  const maxRaw = BigInt($("#borrow-value")?.dataset.maxUnits || "0");
+  const maxBorrow = fromUsdcUnits(maxRaw);
   const amount = Number(draft.amount);
   const principal = Number.isFinite(amount) && amount > 0 ? amount : 0;
-  const fee = (principal * FEE_PERCENT) / 100;
+  const fee = (principal * config.feePercent) / 100;
   const repay = principal + fee;
-
-  const set = (id, text) => {
-    const el = $(id);
-    if (el) el.textContent = text;
-  };
-
-  set("#term-collateral", collateral > 0 ? `$${money(collateral)}` : "—");
-  set("#term-ltv", `${config.ltvPercent}%`);
-  set("#term-max", collateral > 0 ? `$${money(maxBorrow)} USDC` : "—");
-  set("#term-fee", principal > 0 ? `$${money(fee)}` : "—");
-  set("#term-repay", principal > 0 ? `$${money(repay)}` : "—");
-  set("#term-days", `${config.loanDays} days`);
-  set("#sum-collection", draft.collectionName || (draft.collection ? shortAddress(draft.collection) : "—"));
-  set("#sum-token", draft.tokenId || "—");
-  set("#sum-principal", principal > 0 ? `$${money(principal)} USDC` : "—");
-  set("#sum-due", principal > 0 ? `$${money(repay)} USDC` : "—");
-
-  return { collateral, maxBorrow, principal, fee, repay, draft };
+  text($("#term-collateral"), maxRaw > 0n ? `${money(maxBorrow)} USDC max` : "—");
+  text($("#term-ltv"), `${config.ltvPercent}%`);
+  text($("#term-max"), maxRaw > 0n ? `$${money(maxBorrow)} USDC` : "—");
+  text($("#term-fee"), principal > 0 ? `$${money(fee)}` : "—");
+  text($("#term-repay"), principal > 0 ? `$${money(repay)} USDC` : "—");
+  text($("#term-days"), `${config.loanDays} days`);
+  text(
+    $("#sum-collection"),
+    draft.collectionName || (draft.collection ? shortAddress(draft.collection) : "—")
+  );
+  text($("#sum-token"), draft.tokenId || "—");
+  text($("#sum-principal"), principal > 0 ? `$${money(principal)} USDC` : "—");
+  text($("#sum-due"), principal > 0 ? `$${money(repay)} USDC` : "—");
+  return { maxBorrow, maxRaw, principal, fee, repay, draft };
 }
 
 function renderNftGrid() {
   const grid = $("#nft-grid");
   if (!grid) return;
-  grid.innerHTML = COLLECTIONS.map(
-    (c) => `
-    <button type="button" class="nft-pick${c.live ? "" : " nft-pick--soon"}" data-id="${c.id}" ${c.live ? "" : "disabled"}>
-      <div class="nft-face nft-face--${c.id}"><span class="nft-face__shine"></span></div>
-      <strong>${c.name}</strong>
-      <span>${
-        c.valuation === "locked-dust"
-          ? "Priced by locked DUST"
-          : c.live
-            ? `${c.items.toLocaleString()} items · ${c.floorMon.toLocaleString()} MON`
-            : "Mints in ~24h · address TBA"
-      }</span>
-    </button>`
-  ).join("");
-
-  grid.addEventListener("click", (e) => {
-    const btn = e.target.closest(".nft-pick");
-    if (!btn) return;
-    const c = COLLECTIONS.find((x) => x.id === btn.dataset.id);
-    if (!c || !c.live || !c.address) return;
-    $$(".nft-pick").forEach((el) => el.classList.toggle("is-selected", el === btn));
-    const col = $("#borrow-collection");
-    const tok = $("#borrow-token");
-    const val = $("#borrow-value");
-    if (col) {
-      col.value = c.address;
-      col.dataset.name = c.name;
-    }
-    if (tok) tok.value = "";
-    if (val) {
-      val.value = c.valuation === "locked-dust" ? "" : String(c.floorUsd);
-      val.readOnly = c.valuation === "locked-dust";
-    }
-    $("#custom-fields")?.removeAttribute("hidden");
-    const toggle = $("#toggle-custom");
-    if (toggle) toggle.textContent = "Hide token fields";
-    const label = document.querySelector("label[for='borrow-value']");
-    if (label) {
-      label.textContent =
-        c.valuation === "locked-dust"
-          ? "Locked DUST value (USD)"
-          : "Estimated NFT value (USD)";
-    }
-    setStatus(
-      $("#borrow-step1-status"),
+  grid.replaceChildren();
+  COLLECTIONS.forEach((c) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `nft-pick${c.live ? "" : " nft-pick--soon"}`;
+    btn.dataset.id = c.id;
+    if (!c.live) btn.disabled = true;
+    const face = document.createElement("div");
+    face.className = `nft-face nft-face--${c.id}`;
+    const shine = document.createElement("span");
+    shine.className = "nft-face__shine";
+    face.append(shine);
+    const title = document.createElement("strong");
+    title.textContent = c.name;
+    const meta = document.createElement("span");
+    meta.textContent =
       c.valuation === "locked-dust"
-        ? "Enter the token ID. Value is the DUST locked in that NFT."
-        : ""
-    );
+        ? "Pool prices the collection; lock shown for reference"
+        : `${c.items.toLocaleString()} items · ${c.floorMon.toLocaleString()} MON floor`;
+    btn.append(face, title, meta);
+    btn.addEventListener("click", () => selectCollection(c, btn));
+    grid.append(btn);
   });
 }
 
+function selectCollection(c, btn) {
+  $$(".nft-pick").forEach((el) => el.classList.toggle("is-selected", el === btn));
+  const col = $("#borrow-collection");
+  const tok = $("#borrow-token");
+  const val = $("#borrow-value");
+  if (col) {
+    col.value = c.address;
+    col.dataset.name = c.name;
+    col.readOnly = true;
+  }
+  if (tok) tok.value = "";
+  if (val) {
+    val.value = "";
+    val.readOnly = true;
+    delete val.dataset.maxUnits;
+  }
+  $("#custom-fields")?.removeAttribute("hidden");
+  const toggle = $("#toggle-custom");
+  if (toggle) toggle.textContent = "Hide token fields";
+  const label = document.querySelector("label[for='borrow-value']");
+  if (label) label.textContent = "Pool max borrow (USDC)";
+  setStatus(
+    $("#borrow-step1-status"),
+    "Enter the token ID you own. The pool quote is read on-chain."
+  );
+  void refreshPoolQuote(c.address);
+}
+
+async function refreshPoolQuote(collection) {
+  const val = $("#borrow-value");
+  const status = $("#borrow-step1-status");
+  if (!isHexAddress(collection) || !val) return;
+  try {
+    const quote = await readPoolQuote(collection);
+    val.dataset.maxUnits = quote.availableReserve.toString();
+    val.value = fromUsdcUnits(quote.availableReserve).toFixed(2);
+    updateTermsQuote();
+  } catch (err) {
+    if (val) {
+      val.value = "";
+      delete val.dataset.maxUnits;
+    }
+    setStatus(status, err.message || "Collection is not listed on the pool", "err");
+  }
+}
+
 function renderLoans() {
-  const store = loadStore();
   const list = $("#loans-list");
-  const tvl = $("#stat-tvl");
-  const supply = $("#stat-supply");
-  const open = $("#stat-loans");
-  const active = store.loans.filter((l) => l.status === "active");
-  if (tvl) tvl.textContent = `$${money(store.supplied, 0)}`;
-  if (supply) supply.textContent = `$${money(store.supplied, 0)}`;
-  if (open) open.textContent = String(active.length);
   if (!list) return;
-  if (!store.loans.length) {
-    list.innerHTML = `<div class="loan loan--empty">No loans yet. Borrow against an NFT to see it listed here.</div>`;
+  list.replaceChildren();
+  const positions = loadPositions();
+  if (!positions.length) {
+    const empty = document.createElement("div");
+    empty.className = "loan loan--empty";
+    empty.textContent = "No tracked positions yet. A loan appears here after the borrow transaction confirms.";
+    list.append(empty);
     return;
   }
-  list.innerHTML = store.loans
-    .map((loan) => {
-      const due = new Date(loan.dueAt).toLocaleDateString();
-      const action =
-        loan.status === "active"
-          ? `<button type="button" class="btn-cta" data-repay="${loan.id}">Repay</button>`
-          : `<span class="loan--repaid">Unlocked</span>`;
-      return `<div class="loan">
-        <div>
-          <strong>${loan.collectionName} #${loan.tokenId}</strong>
-          <p>$${money(loan.principal)} · due $${money(loan.repay)} · ${due}</p>
-        </div>
-        ${action}
-      </div>`;
-    })
-    .join("");
+  positions.forEach((pos) => {
+    const row = document.createElement("div");
+    row.className = "loan";
+    const info = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = `${pos.collectionName || shortAddress(pos.collection)} #${pos.tokenId}`;
+    const detail = document.createElement("p");
+    detail.textContent = pos.hash
+      ? `Borrow tx ${pos.hash.slice(0, 10)}…`
+      : "Awaiting chain read";
+    info.append(title, detail);
+    row.append(info);
+    if (pos.hash) {
+      const link = document.createElement("a");
+      link.href = explorerTx(pos.hash);
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Explorer";
+      row.append(link);
+    }
+    const repayBtn = document.createElement("button");
+    repayBtn.type = "button";
+    repayBtn.className = "btn-cta";
+    repayBtn.textContent = "Repay on-chain";
+    repayBtn.dataset.collection = pos.collection;
+    repayBtn.dataset.tokenId = pos.tokenId;
+    row.append(repayBtn);
+    list.append(row);
+  });
+  void refreshStats();
+}
+
+async function refreshStats() {
+  const addr = getAddress();
+  if (addr) {
+    try {
+      const supplied = fromUsdcUnits(await readBUsdcBalance(addr));
+      text($("#stat-supply"), `$${money(supplied, 0)}`);
+      text($("#stat-tvl"), `$${money(supplied, 0)}`);
+    } catch {
+      /* leave previous */
+    }
+  }
+  text($("#stat-loans"), String(loadPositions().length));
 }
 
 function initBorrowWizard() {
@@ -227,21 +284,20 @@ function initBorrowWizard() {
     const draft = readBorrowDraft();
     try {
       if (!getAddress()) await connectWallet();
-      if (!/^0x[a-fA-F0-9]{40}$/.test(draft.collection)) {
-        throw new Error("Select a listed collection or enter a valid contract");
+      if (!isHexAddress(draft.collection)) {
+        throw new Error("Select a listed collection");
       }
-      if (draft.tokenId === "" || Number.isNaN(Number(draft.tokenId))) {
-        throw new Error("Enter the token ID you actually own");
-      }
-      if (!Number.isFinite(draft.nftValue) || draft.nftValue <= 0) {
-        throw new Error("Enter an estimated NFT value greater than 0");
+      if (!isTokenId(draft.tokenId)) {
+        throw new Error("Token ID must be an unsigned integer");
       }
       await assertOwnsNft(draft.collection, draft.tokenId);
-      setStatus(status, "", null);
-      updateTermsQuote();
+      await refreshPoolQuote(draft.collection);
+      const { maxRaw } = updateTermsQuote();
+      if (maxRaw === 0n) throw new Error("Pool reports no borrow capacity for this collection");
+      setStatus(status, "");
       setWizardStep(2);
     } catch (err) {
-      setStatus(status, err?.message || "Invalid NFT details", "err");
+      setStatus(status, err?.message || "Cannot continue", "err");
     }
   });
 
@@ -249,17 +305,15 @@ function initBorrowWizard() {
 
   $("#borrow-to-confirm")?.addEventListener("click", () => {
     const status = $("#borrow-step2-status");
-    const { principal, maxBorrow, draft } = updateTermsQuote();
+    const { principal, maxBorrow } = updateTermsQuote();
     try {
       if (!Number.isFinite(principal) || principal <= 0) {
         throw new Error("Enter a USDC amount greater than 0");
       }
       if (principal > maxBorrow + 1e-9) {
-        throw new Error(`Amount exceeds max borrow ($${money(maxBorrow)} at ${config.ltvPercent}% LTV)`);
+        throw new Error(`Amount exceeds pool max ($${money(maxBorrow)} USDC)`);
       }
-      toUsdcUnits(draft.amount);
-      setStatus(status, "", null);
-      updateTermsQuote();
+      setStatus(status, "");
       setWizardStep(3);
     } catch (err) {
       setStatus(status, err?.message || "Invalid amount", "err");
@@ -272,32 +326,27 @@ function initBorrowWizard() {
 
   $("#borrow-confirm")?.addEventListener("click", async () => {
     const status = $("#borrow-status");
-    const { principal, fee, repay, draft } = updateTermsQuote();
+    const { principal, draft } = updateTermsQuote();
     try {
       if (!getAddress()) await connectWallet();
-      const store = loadStore();
-      store.loans.unshift({
-        id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+      setStatus(status, "Confirm the NFT approval and borrow in your wallet…");
+      const result = await borrowUsdc(draft.collection, draft.tokenId, principal);
+      savePosition({
         collection: draft.collection,
         collectionName: draft.collectionName || shortAddress(draft.collection),
         tokenId: draft.tokenId,
-        principal,
-        fee,
-        repay,
-        openedAt: Date.now(),
-        dueAt: Date.now() + config.loanDays * 86_400_000,
-        status: "active",
+        hash: result.borrow.hash,
       });
-      saveStore(store);
       renderLoans();
-      const note = isPoolConfigured()
-        ? `Locked ${draft.collectionName || shortAddress(draft.collection)} #${draft.tokenId}.`
-        : `Preview loan opened (pool address not set). Locked ${draft.collectionName || shortAddress(draft.collection)} #${draft.tokenId}.`;
-      setStatus(status, `${note} $${money(principal)} USDC.`, "ok");
+      setStatus(
+        status,
+        `Borrow submitted. ${explorerTx(result.borrow.hash)}`,
+        "ok"
+      );
       setWizardStep(1);
       showLoansTab();
     } catch (err) {
-      setStatus(status, err?.message || "Borrow failed", "err");
+      setStatus(status, err?.message || "Borrow transaction failed", "err");
     }
   });
 
@@ -311,12 +360,18 @@ function initBorrowWizard() {
       const col = $("#borrow-collection");
       if (col) {
         col.value = "";
+        col.readOnly = false;
         delete col.dataset.name;
       }
     } else {
       box.setAttribute("hidden", "");
       $("#toggle-custom").textContent = "Use a different collection";
     }
+  });
+
+  $("#borrow-collection")?.addEventListener("change", () => {
+    const addr = $("#borrow-collection")?.value.trim();
+    if (isHexAddress(addr)) void refreshPoolQuote(addr);
   });
 
   setWizardStep(1);
@@ -330,10 +385,7 @@ function wireConnectButton(btn) {
         await disconnectWallet();
         return;
       }
-      // Browser wallets remain the default. Without an injected provider the
-      // same button opens WalletConnect's QR modal for mobile/desktop wallets.
-      if (window.ethereum) await connectWallet();
-      else await connectWalletConnect();
+      await connectWallet();
     } catch (e) {
       alert(e?.message || "Wallet connection failed");
     }
@@ -346,11 +398,11 @@ function initWalletUi() {
   const netDot = $("#network-dot");
   const netLabel = $("#network-label");
 
-  onWalletChange(({ address, short, kind }) => {
+  onWalletChange(({ address, short }) => {
     [btn, heroBtn].forEach((b) => {
       if (!b) return;
       if (address) {
-        b.textContent = kind === "demo" ? `${short} · preview` : short;
+        b.textContent = short;
         b.classList.add("wallet-btn--connected");
         b.dataset.connected = "1";
       } else {
@@ -359,6 +411,7 @@ function initWalletUi() {
         delete b.dataset.connected;
       }
     });
+    void refreshStats();
   });
 
   wireConnectButton(btn);
@@ -366,13 +419,13 @@ function initWalletUi() {
 
   async function refreshNetwork() {
     if (!netDot || !netLabel) return;
-    if (!window.ethereum) {
-      netLabel.textContent = "Monad";
-      return;
-    }
     try {
-      const id = await window.ethereum.request({ method: "eth_chainId" });
-      const onMonad = id === config.chainIdHex;
+      const id = await readChainId();
+      if (!id) {
+        netLabel.textContent = "Monad";
+        return;
+      }
+      const onMonad = String(id).toLowerCase() === config.chainIdHex.toLowerCase();
       netDot.classList.toggle("network-pill__dot--warn", !onMonad);
       netLabel.textContent = onMonad ? "Monad" : "Wrong network";
     } catch {
@@ -382,18 +435,27 @@ function initWalletUi() {
 
   bindWalletListeners();
   silentConnect().then(refreshNetwork);
-  window.ethereum?.on?.("chainChanged", refreshNetwork);
+  getProvider()?.on?.("chainChanged", refreshNetwork);
 }
 
-function initConfigBanner() {
+async function initConfigBanner() {
   const banner = $("#config-banner");
   if (!banner) return;
-  if (isPoolConfigured()) {
-    banner.hidden = true;
-    return;
+  try {
+    const check = await verifyPool(rpcPublic);
+    if (check.ok) {
+      banner.hidden = true;
+      return;
+    }
+    banner.hidden = false;
+    banner.replaceChildren();
+    const strong = document.createElement("strong");
+    strong.textContent = "Pool check failed. ";
+    banner.append(strong, document.createTextNode(check.reason));
+  } catch (err) {
+    banner.hidden = false;
+    banner.textContent = err.message || "Could not verify LendPool";
   }
-  banner.hidden = false;
-  banner.innerHTML = `<strong>Pool not connected yet.</strong> Set <code>lendPoolAddress</code> in <code>js/config.js</code> after deploy. USDC defaults to <code>${shortAddress(config.usdcAddress)}</code>. Preview loans still work locally.`;
 }
 
 function initForms() {
@@ -404,35 +466,60 @@ function initForms() {
     const supplyStatus = $("#supply-status");
     try {
       if (!getAddress()) await connectWallet();
-      const n = Number(amount);
-      if (!Number.isFinite(n) || n <= 0) throw new Error("Enter a USDC amount greater than 0");
-      toUsdcUnits(amount);
-      const store = loadStore();
-      store.supplied += n;
-      saveStore(store);
-      renderLoans();
+      setStatus(supplyStatus, "Confirm the USDC approval and deposit in your wallet…");
+      const result = await supplyUsdc(amount);
       e.target.reset();
-      const extra = isPoolConfigured() ? "" : " Preview supply recorded locally.";
-      setStatus(supplyStatus, `Supplied $${money(n)} USDC.${extra}`, "ok");
+      setStatus(
+        supplyStatus,
+        `Deposit submitted. ${explorerTx(result.deposit.hash)}`,
+        "ok"
+      );
+      void refreshStats();
     } catch (err) {
-      setStatus(supplyStatus, err?.message || "Supply failed", "err");
+      setStatus(supplyStatus, err?.message || "Deposit transaction failed", "err");
     }
   });
 
   $("#loans-list")?.addEventListener("click", async (e) => {
-    const btn = e.target.closest("[data-repay]");
+    const btn = e.target.closest("[data-collection][data-token-id]");
     if (!btn) return;
     try {
       if (!getAddress()) await connectWallet();
-      const store = loadStore();
-      store.loans = store.loans.map((l) =>
-        l.id === btn.dataset.repay ? { ...l, status: "repaid" } : l
-      );
-      saveStore(store);
-      renderLoans();
+      const result = await repayLoan(btn.dataset.collection, btn.dataset.tokenId);
+      alert(`Repay submitted. ${explorerTx(result.repay.hash)}`);
+      void refreshStats();
     } catch (err) {
-      alert(err?.message || "Repay failed");
+      alert(err?.message || "Repay transaction failed");
     }
+  });
+}
+
+function initDustLookup() {
+  const tok = $("#borrow-token");
+  if (!tok) return;
+  let timer = 0;
+  tok.addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const col = $("#borrow-collection");
+      const status = $("#borrow-step1-status");
+      const id = tok.value.trim();
+      if (col?.value.toLowerCase() !== DUST.veNft.toLowerCase()) return;
+      if (!isTokenId(id)) {
+        setStatus(status, "Token ID must be an unsigned integer.");
+        return;
+      }
+      try {
+        const lock = await readDustLock(id);
+        setStatus(
+          status,
+          `${lock.dust.toLocaleString(undefined, { maximumFractionDigits: 2 })} DUST locked (reference only). Pool quote still comes from the oracle.`,
+          "ok"
+        );
+      } catch (err) {
+        setStatus(status, err?.message || "Could not read lock", "err");
+      }
+    }, 400);
   });
 }
 
@@ -442,47 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTabs();
   initBorrowWizard();
   initWalletUi();
-  initConfigBanner();
+  void initConfigBanner();
   initForms();
   initDustLookup();
 });
-
-function initDustLookup() {
-  const tok = $("#borrow-token");
-  const val = $("#borrow-value");
-  if (!tok || !val) return;
-  let timer = 0;
-  const run = () => {
-    const col = $("#borrow-collection");
-    const status = $("#borrow-step1-status");
-    if (col?.value.toLowerCase() !== DUST_VE) return;
-    const id = tok.value.trim();
-    if (!/^\d+$/.test(id)) {
-      val.value = "";
-      setStatus(status, "Enter the token ID. Value is locked DUST, not the floor.");
-      return;
-    }
-    setStatus(status, "Reading lock…");
-    void readDustLock(id)
-      .then((lock) => {
-        if (tok.value.trim() !== id) return;
-        val.value = lock.usd.toFixed(2);
-        setStatus(
-          status,
-          `${lock.dust.toLocaleString(undefined, { maximumFractionDigits: 2 })} DUST locked · $${lock.usd.toFixed(2)} at $${lock.dustPriceUsd.toFixed(4)} / DUST`,
-          "ok"
-        );
-      })
-      .catch((err) => {
-        if (tok.value.trim() !== id) return;
-        val.value = "";
-        setStatus(status, err?.message || "Could not read lock", "err");
-      });
-  };
-  tok.addEventListener("input", () => {
-    clearTimeout(timer);
-    timer = setTimeout(run, 400);
-  });
-}
-
-const DUST_VE = "0xbb4738d05ad1b3da57a4881bae62ce9bb1eeed6c";
