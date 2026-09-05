@@ -199,5 +199,12 @@
   },
   "BNFTDaks": {
     "address": "0xf939FB398dfC8440c1Aef8507D3e8f579095Bb97"
+  },
+  "NftVeDust": {
+    "address": "0xbb4738d05ad1b3da57a4881bae62ce9bb1eeed6c",
+    "note": "OpenSea voting-escrow-dust"
+  },
+  "BNFTVeDust": {
+    "address": "0xC8A026Dcce707444026Fc94fF1a6FB250C37dBb7"
   }
 }

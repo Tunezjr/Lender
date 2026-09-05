@@ -462,11 +462,11 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
     radial-gradient(circle at 18% 80%, #533afd 0%, transparent 50%),
     linear-gradient(135deg, #c4b5fd 0%, #0d253d 100%);
 }
-.nft-face--daks {
+.nft-face--vedust {
   background:
-    radial-gradient(circle at 70% 20%, #ffb088 0%, transparent 42%),
-    radial-gradient(circle at 20% 70%, #c4b5fd 0%, transparent 48%),
-    linear-gradient(160deg, #533afd 0%, #0d253d 100%);
+    radial-gradient(circle at 40% 20%, #fff9f0 0%, transparent 36%),
+    radial-gradient(circle at 80% 70%, #533afd 0%, transparent 48%),
+    linear-gradient(160deg, #0d253d 0%, #c4b5fd 100%);
 }
 .nft-pick--soon {
   opacity: 0.55;
