@@ -181,5 +181,23 @@
   },
   "BNFTChog": {
     "address": "0xb29C16535b58193C78211711B5a2930Ab4bA7ED7"
+  },
+  "NftR3tards": {
+    "address": "0x200723a706de0013316e5cd8eba2b3f53dd90c29"
+  },
+  "BNFTR3tards": {
+    "address": "0xdD9302b832530EC0Ea5A881b7eDa3Fea8a53dE4e"
+  },
+  "Nft10kSquad": {
+    "address": "0x818030837e8350ba63e64d7dc01a547fa73c8279"
+  },
+  "BNFT10kSquad": {
+    "address": "0x891129C46B7C9996F28A8708D5051E5c6e42e447"
+  },
+  "NftDaks": {
+    "address": "0x9f8514cebee138b61806d4651f51d26c8098b463"
+  },
+  "BNFTDaks": {
+    "address": "0xf939FB398dfC8440c1Aef8507D3e8f579095Bb97"
   }
 }
