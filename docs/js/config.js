@@ -18,6 +18,7 @@ export const config = Object.freeze({
   loanDays: 7,
   usdcDecimals: 6,
   feePercent: 3,
+  walletConnectProjectId: "429370f458176860b6462c5c0aa74886",
 });
 
 export const DUST = Object.freeze({
@@ -79,6 +80,10 @@ export const COLLECTIONS = Object.freeze([
 const IMPL_SLOT =
   "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
 
+export function isWalletConnectConfigured() {
+  return /^[a-f0-9]{32}$/i.test(config.walletConnectProjectId || "");
+}
+
 export function isHexAddress(value) {
   return /^0x[a-fA-F0-9]{40}$/.test(value);
 }
@@ -108,10 +113,6 @@ export function toUsdcUnits(amount) {
 
 export function fromUsdcUnits(raw) {
   return Number(raw) / 10 ** config.usdcDecimals;
-}
-
-export function isWalletConnectConfigured() {
-  return false;
 }
 
 export async function verifyPool(rpcCall) {
