@@ -1,3 +1,37 @@
+/**
+ * Lender frontend config — set addresses after contract deploy.
+ * Override at runtime via window.__LENDER_CONFIG__ before modules load.
+ */
+const defaults = {
+  lendPoolAddress: "0xc779850835B7C6872f7B2893A4d4A2cCf3733F15",
+  usdcAddress: "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+  chainId: 143,
+  chainIdHex: "0x8f",
+  chainName: "Monad",
+  rpcUrl: "https://rpc.monad.xyz",
+  explorerUrl: "https://monadvision.com",
+  nativeCurrency: { name: "MON", symbol: "MON", decimals: 18 },
+  ltvPercent: 30,
+  loanDays: 7,
+  usdcDecimals: 6,
+  feePercent: 3,
+  walletConnectProjectId: "",
+};
+
+export const config = {
+  ...defaults,
+  ...(typeof window !== "undefined" ? window.__LENDER_CONFIG__ || {} : {}),
+};
+
+export const DEMO_WALLET = "0xA11CE00000000000000000000000000000C0FFEE";
+
+export const DUST = {
+  token: "0xad96c3dffcd6374294e2573a7fbba96097cc8d7c",
+  veNft: "0xbb4738d05ad1b3da57a4881bae62ce9bb1eeed6c",
+  pair: "0x86dbf00485871c901c5129bd525348db96c2eb2d",
+  usdc: "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+};
+
 export const COLLECTIONS = [
   {
     id: "chog",
@@ -48,10 +82,44 @@ export const COLLECTIONS = [
     name: "Voting Escrow DUST",
     address: "0xbb4738d05ad1b3da57a4881bae62ce9bb1eeed6c",
     tokenId: "",
-    floorMon: 17,
-    floorUsd: 1,
+    floorMon: 0,
+    floorUsd: 0,
     items: 0,
     live: true,
+    valuation: "locked-dust",
     opensea: "https://opensea.io/collection/voting-escrow-dust",
   },
 ];
+
+export function isPoolConfigured() {
+  return Boolean(
+    config.lendPoolAddress && /^0x[a-fA-F0-9]{40}$/.test(config.lendPoolAddress)
+  );
+}
+
+export function isWalletConnectConfigured() {
+  return Boolean(config.walletConnectProjectId);
+}
+
+export function shortAddress(addr) {
+  if (!addr) return "";
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+}
+
+export function money(n, digits = 2) {
+  if (!Number.isFinite(n)) return "—";
+  return n.toLocaleString(undefined, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
+}
+
+export function isHexAddress(value) {
+  return /^0x[a-fA-F0-9]{40}$/.test(value);
+}
+
+export function toUsdcUnits(amount) {
+  const n = Number(amount);
+  if (!Number.isFinite(n) || n <= 0) throw new Error("Enter a USDC amount greater than 0");
+  return Math.round(n * 10 ** config.usdcDecimals);
+}

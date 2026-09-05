@@ -6,6 +6,7 @@ import {
   shortAddress,
   toUsdcUnits,
 } from "./config.js";
+import { readDustLock } from "./vedust.js";
 import {
   connectWallet,
   connectWalletConnect,
@@ -140,7 +141,13 @@ function renderNftGrid() {
     <button type="button" class="nft-pick${c.live ? "" : " nft-pick--soon"}" data-id="${c.id}" ${c.live ? "" : "disabled"}>
       <div class="nft-face nft-face--${c.id}"><span class="nft-face__shine"></span></div>
       <strong>${c.name}</strong>
-      <span>${c.live ? `${c.items.toLocaleString()} items · ${c.floorMon.toLocaleString()} MON` : "Mints in ~24h · address TBA"}</span>
+      <span>${
+        c.valuation === "locked-dust"
+          ? "Priced by locked DUST"
+          : c.live
+            ? `${c.items.toLocaleString()} items · ${c.floorMon.toLocaleString()} MON`
+            : "Mints in ~24h · address TBA"
+      }</span>
     </button>`
   ).join("");
 
@@ -158,10 +165,26 @@ function renderNftGrid() {
       col.dataset.name = c.name;
     }
     if (tok) tok.value = "";
-    if (val) val.value = String(c.floorUsd);
+    if (val) {
+      val.value = c.valuation === "locked-dust" ? "" : String(c.floorUsd);
+      val.readOnly = c.valuation === "locked-dust";
+    }
     $("#custom-fields")?.removeAttribute("hidden");
     const toggle = $("#toggle-custom");
     if (toggle) toggle.textContent = "Hide token fields";
+    const label = document.querySelector("label[for='borrow-value']");
+    if (label) {
+      label.textContent =
+        c.valuation === "locked-dust"
+          ? "Locked DUST value (USD)"
+          : "Estimated NFT value (USD)";
+    }
+    setStatus(
+      $("#borrow-step1-status"),
+      c.valuation === "locked-dust"
+        ? "Enter the token ID. Value is the DUST locked in that NFT."
+        : ""
+    );
   });
 }
 
@@ -421,4 +444,45 @@ document.addEventListener("DOMContentLoaded", () => {
   initWalletUi();
   initConfigBanner();
   initForms();
+  initDustLookup();
 });
+
+function initDustLookup() {
+  const tok = $("#borrow-token");
+  const val = $("#borrow-value");
+  if (!tok || !val) return;
+  let timer = 0;
+  const run = () => {
+    const col = $("#borrow-collection");
+    const status = $("#borrow-step1-status");
+    if (col?.value.toLowerCase() !== DUST_VE) return;
+    const id = tok.value.trim();
+    if (!/^\d+$/.test(id)) {
+      val.value = "";
+      setStatus(status, "Enter the token ID. Value is locked DUST, not the floor.");
+      return;
+    }
+    setStatus(status, "Reading lock…");
+    void readDustLock(id)
+      .then((lock) => {
+        if (tok.value.trim() !== id) return;
+        val.value = lock.usd.toFixed(2);
+        setStatus(
+          status,
+          `${lock.dust.toLocaleString(undefined, { maximumFractionDigits: 2 })} DUST locked · $${lock.usd.toFixed(2)} at $${lock.dustPriceUsd.toFixed(4)} / DUST`,
+          "ok"
+        );
+      })
+      .catch((err) => {
+        if (tok.value.trim() !== id) return;
+        val.value = "";
+        setStatus(status, err?.message || "Could not read lock", "err");
+      });
+  };
+  tok.addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(run, 400);
+  });
+}
+
+const DUST_VE = "0xbb4738d05ad1b3da57a4881bae62ce9bb1eeed6c";
