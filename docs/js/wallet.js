@@ -68,8 +68,8 @@ async function getWalletConnectProvider() {
     metadata: {
       name: "Lender",
       description: "NFT-backed USDC credit on Monad",
-      url: window.location.origin,
-      icons: [`${window.location.origin}/favicon.ico`],
+      url: "https://lender-swart-zeta.vercel.app",
+      icons: ["https://lender-swart-zeta.vercel.app/favicon.ico"],
     },
   });
   bindProviderListeners(walletConnectProvider);
