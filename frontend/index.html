@@ -16,6 +16,205 @@
     <link rel="stylesheet" href="./css/ticker.css" />
   </head>
   <body>
-    <!-- content truncated intentionally - use full local file -->
+    <div class="grove-stage" aria-hidden="true">
+      <img class="grove-still" src="./grove/tree.jpg" alt="" />
+      <video id="grove-film" class="grove-film" src="./grove/grove.mp4" poster="./grove/tree.jpg" autoplay muted loop playsinline preload="auto"></video>
+      <canvas id="grove-leaves" class="grove-leaves"></canvas>
+      <div class="grove-wash"></div>
+    </div>
+    <div class="mesh-stage" aria-hidden="true">
+      <div class="mesh-band">
+        <div class="mesh-token-wash"></div>
+        <div class="mesh-blobs">
+          <div class="mesh-blob mesh-blob-a"></div>
+          <div class="mesh-blob mesh-blob-b"></div>
+          <div class="mesh-blob mesh-blob-c"></div>
+          <div class="mesh-blob mesh-blob-d"></div>
+        </div>
+      </div>
+      <div class="mesh-fade"></div>
+      <div class="mesh-grid"></div>
+      <svg class="mesh-noise" xmlns="http://www.w3.org/2000/svg">
+        <filter id="lender-grain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#lender-grain)" />
+      </svg>
+    </div>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="./">
+          <span class="brand__mark" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          </span>
+          <span class="brand__name">Lender</span>
+        </a>
+        <nav class="header-nav" aria-label="Primary">
+          <a class="nav-link" href="#benefits">Benefits</a>
+          <a class="nav-link" href="#how">How it works</a>
+          <a class="nav-link" href="#security">Security</a>
+          <a class="nav-link" href="#app">App</a>
+          <a class="nav-link" href="#faq">FAQ</a>
+        </nav>
+        <div class="header-actions">
+          <span class="network-pill" title="Network">
+            <span class="network-pill__dot" id="network-dot"></span>
+            <span id="network-label">Wrong network</span>
+          </span>
+          <button type="button" class="btn-cta" id="wallet-btn">Connect Wallet</button>
+          <button type="button" class="btn-ghost" id="wc-btn">WalletConnect</button>
+        </div>
+      </div>
+    </header>
+    <main class="main">
+      <section class="hero">
+        <div class="hero__pills">
+          <span class="pill">Built on Monad</span>
+          <span class="pill">Non-custodial</span>
+          <span class="pill">Max 30% LTV · 7-day terms</span>
+        </div>
+        <h1>Borrow against your NFTs,<br />instantly.</h1>
+        <p class="hero__lede">Lock an NFT in a non-custodial smart contract and receive USDC in seconds — no credit check, no application. Settled on Monad.</p>
+        <div class="hero__actions">
+          <button type="button" class="btn-cta btn-cta--lg" id="hero-connect">Connect Wallet</button>
+          <a class="btn-ghost" href="#how">See how it works</a>
+        </div>
+      </section>
+      <section class="section" id="benefits">
+        <p class="section-kicker">Benefits</p>
+        <h2 class="section-title">Your NFT is already worth something.</h2>
+        <p class="section-lede">Lender lets you borrow USDC instantly against your NFTs — fully non-custodial, so you always hold the keys.</p>
+      </section>
+      <section class="section" id="how">
+        <p class="section-kicker">How it works</p>
+        <h2 class="section-title">Borrow USDC against your NFT in three steps</h2>
+        <p class="section-lede">No paperwork, no waiting, fully on-chain.</p>
+      </section>
+      <section class="section" id="security">
+        <p class="section-kicker">Security</p>
+        <h2 class="section-title">Your NFT, your escrow</h2>
+      </section>
+      <section class="section section--app" id="app">
+        <p class="section-kicker">App</p>
+        <h2 class="section-title">Borrow, supply, manage</h2>
+        <p class="section-lede">Pick collateral, draw USDC, and repay.</p>
+        <div class="stats" aria-label="Pool stats">
+          <div class="stat"><p>Pool TVL</p><strong id="stat-tvl">$1,240,000.00</strong></div>
+          <div class="stat"><p>Your supply</p><strong id="stat-supply">$0.00</strong></div>
+          <div class="stat"><p>Open loans</p><strong id="stat-loans">0</strong></div>
+        </div>
+        <div class="banner" id="config-banner" hidden></div>
+        <div class="tabs" role="tablist" aria-label="Actions">
+          <button class="tab" type="button" role="tab" data-tab="borrow" aria-selected="true">Borrow</button>
+          <button class="tab" type="button" role="tab" data-tab="supply" aria-selected="false">Supply</button>
+          <button class="tab" type="button" role="tab" data-tab="loans" aria-selected="false">Your Loans</button>
+        </div>
+        <section class="panel" data-tab-panel="borrow" role="tabpanel">
+          <div class="wizard" id="borrow-wizard">
+            <div class="wizard__steps" aria-label="Borrow steps">
+              <button type="button" class="wizard__step is-active" data-step="1">1 · Select NFT</button>
+              <button type="button" class="wizard__step" data-step="2">2 · Loan terms</button>
+              <button type="button" class="wizard__step" data-step="3">3 · Confirm</button>
+            </div>
+            <div class="card card--wide" data-wizard-panel="1">
+              <h2 class="card__title">Select NFT</h2>
+              <p class="card__subtitle">Pick collateral from a known collection, or enter a custom token.</p>
+              <div class="nft-grid" id="nft-grid"></div>
+              <button type="button" class="linkish" id="toggle-custom">Use a different collection</button>
+              <div class="custom-fields" id="custom-fields" hidden>
+                <div class="field">
+                  <label for="borrow-collection">Collection address</label>
+                  <input id="borrow-collection" name="collection" placeholder="0x…" autocomplete="off" spellcheck="false" />
+                </div>
+                <div class="field">
+                  <label for="borrow-token">Token ID</label>
+                  <input id="borrow-token" name="tokenId" placeholder="42" inputmode="numeric" />
+                </div>
+                <div class="field">
+                  <label for="borrow-value">Pool max borrow (USDC)</label>
+                  <input id="borrow-value" name="nftValue" placeholder="Read from pool" inputmode="decimal" readonly />
+                </div>
+              </div>
+              <button type="button" class="btn-primary" id="borrow-to-terms">Continue to loan terms</button>
+              <p class="status" id="borrow-step1-status" role="status"></p>
+            </div>
+            <div class="card" data-wizard-panel="2" hidden>
+              <h2 class="card__title">Loan terms</h2>
+              <p class="card__subtitle">Instant quote. No commitment until you confirm.</p>
+              <div class="terms">
+                <div class="terms__row"><span>Collateral value</span><span class="mono-numeric" id="term-collateral">—</span></div>
+                <div class="terms__row"><span>Max LTV</span><span class="mono-numeric" id="term-ltv">30%</span></div>
+                <div class="terms__row"><span>Max borrow</span><span class="mono-numeric" id="term-max">—</span></div>
+                <div class="terms__row">
+                  <label for="borrow-amount">Amount (USDC)</label>
+                  <input id="borrow-amount" name="amount" placeholder="0.00" inputmode="decimal" />
+                </div>
+                <div class="terms__row"><span>Fee (3%)</span><span class="mono-numeric" id="term-fee">—</span></div>
+                <div class="terms__row"><span>You'll repay</span><span class="mono-numeric" id="term-repay">—</span></div>
+                <div class="terms__row"><span>Term</span><span class="mono-numeric" id="term-days">7 days</span></div>
+              </div>
+              <div class="wizard__nav">
+                <button type="button" class="btn-ghost" data-wizard-back="1">Back</button>
+                <button type="button" class="btn-primary" id="borrow-to-confirm">Continue</button>
+              </div>
+              <p class="status" id="borrow-step2-status" role="status"></p>
+            </div>
+            <div class="card" data-wizard-panel="3" hidden>
+              <h2 class="card__title">Confirm & lock NFT</h2>
+              <p class="card__subtitle">Review and lock collateral to receive USDC.</p>
+              <div class="terms terms--summary">
+                <div class="terms__row"><span>Collection</span><span class="mono-numeric" id="sum-collection">—</span></div>
+                <div class="terms__row"><span>Token ID</span><span class="mono-numeric" id="sum-token">—</span></div>
+                <div class="terms__row"><span>Principal</span><span class="mono-numeric" id="sum-principal">—</span></div>
+                <div class="terms__row"><span>Total due</span><span class="mono-numeric" id="sum-due">—</span></div>
+                <div class="terms__row"><span>Term</span><span class="mono-numeric">7 days</span></div>
+                <div class="terms__row"><span>USDC recipient</span><span class="mono-numeric" id="sum-recipient">Connected wallet</span></div>
+              </div>
+              <p class="card__subtitle" id="borrow-hint">
+                Confirm approves this NFT to the pool, then borrows USDC into the connected wallet.
+              </p>
+              <div class="wizard__nav">
+                <button type="button" class="btn-ghost" data-wizard-back="2">Back</button>
+                <button type="button" class="btn-primary" id="borrow-confirm">Confirm borrow</button>
+              </div>
+              <p class="status" id="borrow-status" role="status"></p>
+            </div>
+          </div>
+        </section>
+        <section class="panel" data-tab-panel="supply" role="tabpanel" hidden>
+          <div class="card">
+            <h2 class="card__title">Supply</h2>
+            <p class="card__subtitle">Provide USDC liquidity to the pool.</p>
+            <form id="supply-form">
+              <div class="field">
+                <label for="supply-amount">USDC amount</label>
+                <input id="supply-amount" name="amount" placeholder="0.00" inputmode="decimal" />
+              </div>
+              <button class="btn-primary" type="submit">Supply liquidity</button>
+              <p class="status" id="supply-status" role="status"></p>
+            </form>
+          </div>
+        </section>
+        <section class="panel" data-tab-panel="loans" role="tabpanel" hidden>
+          <div class="card card--wide">
+            <h2 class="card__title">Your Loans</h2>
+            <p class="card__subtitle">Track active positions. Repay to unlock collateral.</p>
+            <div class="loans" id="loans-list">
+              <div class="loan loan--empty">No loans yet. Borrow against an NFT to see it listed here.</div>
+            </div>
+          </div>
+        </section>
+      </section>
+      <section class="section faq" id="faq">
+        <p class="section-kicker">FAQ</p>
+        <h2 class="section-title">Frequently asked questions</h2>
+        <details class="faq__item"><summary>Which wallets are supported?</summary><div class="scroll-line" data-line="MetaMask, Coinbase Wallet, Rabby, and any standard browser wallet that supports Monad."></div></details>
+        <details class="faq__item"><summary>What is the maximum LTV?</summary><div class="scroll-line" data-line="30% of the NFT’s value."></div></details>
+        <details class="faq__item"><summary>How long is a loan?</summary><div class="scroll-line" data-line="Fixed 7-day terms."></div></details>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="site-footer__inner"><span class="brand__name">Lender</span></div></footer>
+    <script type="module" src="./js/grove.js"></script>
+    <script type="module" src="./js/app.js"></script>
   </body>
 </html>
