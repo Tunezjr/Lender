@@ -675,3 +675,47 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 
 .custom-fields[hidden] { display: none !important; }
 .wizard-panel[hidden] { display: none !important; }
+
+.grove-stage {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: min(110vh, 980px);
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--cream);
+}
+.grove-still,
+.grove-film {
+  position: absolute;
+  top: -8%;
+  right: -12%;
+  width: 78%;
+  height: 118%;
+  object-fit: cover;
+  object-position: 62% 28%;
+  filter: saturate(1.05);
+}
+@media (max-width: 767px) {
+  .grove-still,
+  .grove-film {
+    right: -28%;
+    width: 130%;
+    object-position: 70% 30%;
+  }
+}
+.grove-leaves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.grove-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, var(--cream) 0%, color-mix(in srgb, var(--cream) 72%, transparent) 38%, transparent 68%),
+    linear-gradient(180deg, color-mix(in srgb, var(--cream) 18%, transparent) 0%, var(--cream) 92%);
+}
+.mesh-stage { background: transparent; }
+

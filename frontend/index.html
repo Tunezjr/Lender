@@ -16,6 +16,23 @@
     <link rel="stylesheet" href="./css/ticker.css" />
   </head>
   <body>
+    <div class="grove-stage" aria-hidden="true">
+      <img class="grove-still" src="./grove/tree.jpg" alt="" />
+      <video
+        id="grove-film"
+        class="grove-film"
+        src="./grove/grove.mp4"
+        poster="./grove/tree.jpg"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+      ></video>
+      <canvas id="grove-leaves" class="grove-leaves"></canvas>
+      <div class="grove-wash"></div>
+    </div>
+
     <div class="mesh-stage" aria-hidden="true">
       <div class="mesh-band">
         <div class="mesh-token-wash"></div>
@@ -330,6 +347,7 @@
     </main>
 
     <footer class="site-footer">Lender · NFT-backed USDC credit · Monad</footer>
+    <script type="module" src="./js/grove.js"></script>
     <script type="module" src="./js/app.js"></script>
   
     <script>
