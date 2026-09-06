@@ -34,7 +34,7 @@ function startGrove() {
     const canopyLeft = w * 0.42;
     leaves.push({
       x: fromCanopy ? canopyLeft + Math.random() * w * 0.5 : Math.random() * w,
-      y: fromCanopy ? 16 + Math.random() * Math.min(window.innerHeight * 0.28, 240) : -40,
+      y: fromCanopy ? window.innerHeight * 0.16 + Math.random() * Math.min(window.innerHeight * 0.3, 260) : -40,
       vx: (Math.random() - 0.35) * 18,
       vy: 18 + Math.random() * 28,
       rot: Math.random() * Math.PI * 2,
