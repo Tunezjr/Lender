@@ -71,7 +71,7 @@
         <div class="header-actions">
           <span class="network-pill" title="Network">
             <span class="network-pill__dot" id="network-dot"></span>
-            <span id="network-label">Monad</span>
+            <span id="network-label">Wrong network</span>
           </span>
           <button type="button" class="btn-cta" id="wallet-btn">Connect Wallet</button>
         </div>
@@ -355,7 +355,7 @@
         const line = el.getAttribute("data-line") || el.textContent.trim();
         if (!line) return;
         const track = document.createElement("div");
-        track.className = "ticker-track" + (i % 2 ? " ticker-track--rev" : "") + " ticker-track--slow";
+        track.className = "ticker-track ticker-track--slow";
         track.innerHTML = Array.from({ length: 8 }, () => "<span>" + line.replace(/</g, "") + "</span>").join("");
         el.replaceChildren(track);
       });

@@ -453,6 +453,7 @@ function initWalletUi() {
       }
     });
     void refreshStats();
+    void refreshNetwork();
   });
 
   wireConnectButton(btn);
@@ -462,15 +463,14 @@ function initWalletUi() {
     if (!netDot || !netLabel) return;
     try {
       const id = await readChainId();
-      if (!id) {
-        netLabel.textContent = "Monad";
-        return;
-      }
-      const onMonad = String(id).toLowerCase() === config.chainIdHex.toLowerCase();
+      const onMonad =
+        Boolean(getAddress()) &&
+        String(id || "").toLowerCase() === config.chainIdHex.toLowerCase();
       netDot.classList.toggle("network-pill__dot--warn", !onMonad);
       netLabel.textContent = onMonad ? "Monad" : "Wrong network";
     } catch {
-      netLabel.textContent = "Network";
+      netDot.classList.add("network-pill__dot--warn");
+      netLabel.textContent = "Wrong network";
     }
   }
 
