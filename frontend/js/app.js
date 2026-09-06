@@ -12,6 +12,7 @@ import {
 import { readDustLock } from "./vedust.js";
 import {
   connectWallet,
+  connectWalletConnect,
   silentConnect,
   disconnectWallet,
   onWalletChange,
@@ -22,6 +23,7 @@ import {
 } from "./wallet.js";
 import {
   assertOwnsNft,
+  borrowUsdc,
   explorerTx,
   readBUsdcBalance,
   readDebt,
@@ -29,14 +31,7 @@ import {
   repayLoan,
   supplyUsdc,
 } from "./pool.js";
-import {
-  borrowFromVault,
-  createOrOpenVault,
-  fundVaultForGas,
-  loadVaultRecord,
-  transferNftToVault,
-  waitUntilVaultOwns,
-} from "./vault.js";
+import { loadVaultRecord } from "./vault.js";
 
 const POS_KEY = "lender-positions";
 
@@ -336,58 +331,26 @@ function initBorrowWizard() {
   $("#borrow-confirm")?.addEventListener("click", async () => {
     const status = $("#borrow-status");
     const { principal, draft } = updateTermsQuote();
-    let secret = null;
     try {
       if (!getAddress()) await connectWallet();
-      setStatus(status, "Create or unlock the Mera vault with your passkey…");
-      const opened = await createOrOpenVault();
-      secret = opened.secret;
-      text($("#sum-vault"), shortAddress(opened.address));
-      setStatus(
-        status,
-        opened.reused
-          ? `Vault ${shortAddress(opened.address)} unlocked. Transfer the NFT in…`
-          : `Vault ${shortAddress(opened.address)} created. Transfer the NFT in…`
-      );
-      const moved = await transferNftToVault(
-        draft.collection,
-        draft.tokenId,
-        opened.address
-      );
-      if (moved.hash) {
-        setStatus(status, `NFT sent to vault. ${explorerTx(moved.hash)}`);
-      }
-      setStatus(status, "Waiting for the vault to hold the NFT…");
-      await waitUntilVaultOwns(draft.collection, draft.tokenId, opened.address);
-      setStatus(status, "Funding vault gas if needed…");
-      await fundVaultForGas(opened.address);
-      setStatus(status, "Originating the loan from the vault…");
-      const result = await borrowFromVault({
-        secret,
-        vaultAddress: opened.address,
-        collection: draft.collection,
-        tokenId: draft.tokenId,
-        amountHuman: principal,
-      });
+      setStatus(status, "Approve the NFT, then confirm borrow in your wallet. USDC goes to this wallet.");
+      const result = await borrowUsdc(draft.collection, draft.tokenId, principal);
       savePosition({
         collection: draft.collection,
         collectionName: draft.collectionName || shortAddress(draft.collection),
         tokenId: draft.tokenId,
-        vault: opened.address,
-        hash: result.borrow,
+        hash: result.borrow.hash,
       });
       renderLoans();
       setStatus(
         status,
-        `Loan opened from vault ${shortAddress(opened.address)}. ${explorerTx(result.borrow)}`,
+        `Borrow submitted. USDC to ${shortAddress(getAddress())}. ${explorerTx(result.borrow.hash)}`,
         "ok"
       );
       setWizardStep(1);
       showLoansTab();
     } catch (err) {
-      setStatus(status, err?.message || "Vault borrow failed", "err");
-    } finally {
-      if (secret) secret.fill(0);
+      setStatus(status, err?.message || "Borrow transaction failed", "err");
     }
   });
 
@@ -436,6 +399,7 @@ function wireConnectButton(btn) {
 function initWalletUi() {
   const btn = $("#wallet-btn");
   const heroBtn = $("#hero-connect");
+  const wcBtn = $("#wc-btn");
   const netDot = $("#network-dot");
   const netLabel = $("#network-label");
 
@@ -452,12 +416,32 @@ function initWalletUi() {
         delete b.dataset.connected;
       }
     });
+    if (wcBtn) {
+      if (address) {
+        wcBtn.textContent = "Disconnect";
+        wcBtn.dataset.connected = "1";
+      } else {
+        wcBtn.textContent = "WalletConnect";
+        delete wcBtn.dataset.connected;
+      }
+    }
     void refreshStats();
     void refreshNetwork();
   });
 
   wireConnectButton(btn);
   wireConnectButton(heroBtn);
+  $("#wc-btn")?.addEventListener("click", async () => {
+    try {
+      if ($("#wc-btn")?.dataset.connected) {
+        await disconnectWallet();
+        return;
+      }
+      await connectWalletConnect();
+    } catch (e) {
+      alert(e?.message || "WalletConnect failed");
+    }
+  });
 
   async function refreshNetwork() {
     if (!netDot || !netLabel) return;
@@ -476,7 +460,6 @@ function initWalletUi() {
 
   bindWalletListeners();
   silentConnect().then(refreshNetwork);
-  getProvider()?.on?.("chainChanged", refreshNetwork);
 }
 
 async function initConfigBanner() {

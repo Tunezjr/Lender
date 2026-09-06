@@ -3,5 +3,26 @@
   "framework": null,
   "installCommand": "true",
   "buildCommand": "true",
-  "outputDirectory": "frontend"
+  "outputDirectory": "frontend",
+  "headers": [
+    {
+      "source": "/.well-known/walletconnect.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=300" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://walletconnect.com https://walletconnect.org; media-src 'self'; connect-src 'self' https://rpc.monad.xyz https://esm.sh https://cdn.esm.sh https://relay.walletconnect.com https://relay.walletconnect.org wss://relay.walletconnect.com wss://relay.walletconnect.org https://explorer-api.walletconnect.com https://rpc.walletconnect.com https://pulse.walletconnect.com https://api.web3modal.com https://keys.walletconnect.com; frame-src https://verify.walletconnect.com https://verify.walletconnect.org https://secure.walletconnect.com https://secure.walletconnect.org;"
+        }
+      ]
+    }
+  ]
 }

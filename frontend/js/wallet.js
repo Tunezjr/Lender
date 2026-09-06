@@ -1,8 +1,12 @@
 import { config, isWalletConnectConfigured, shortAddress } from "./config.js";
 
+const WC_ORIGIN = "https://lender-swart-zeta.vercel.app";
+const SESSION_KEY = "lender-connector";
+
 let address = null;
 let provider = null;
 let walletConnectProvider = null;
+let boundProvider = null;
 const listeners = new Set();
 
 function emit() {
@@ -24,24 +28,50 @@ function getInjectedProvider() {
 }
 
 export function getProvider() {
-  return provider || getInjectedProvider();
+  return provider;
+}
+
+function unbindProvider(p) {
+  if (!p?.removeListener || !p.__lenderListenersBound) return;
+  try {
+    p.removeListener("accountsChanged", onAccountsChanged);
+    p.removeListener("chainChanged", onChainChanged);
+    p.removeListener("disconnect", onDisconnect);
+  } catch {
+    /* ignore */
+  }
+  p.__lenderListenersBound = false;
+  if (boundProvider === p) boundProvider = null;
+}
+
+function onAccountsChanged(accounts) {
+  address = accounts?.[0] || null;
+  if (!address) provider = null;
+  emit();
+}
+
+function onChainChanged() {
+  emit();
+}
+
+function onDisconnect() {
+  address = null;
+  provider = null;
+  emit();
 }
 
 function bindProviderListeners(nextProvider) {
-  if (!nextProvider?.on || nextProvider.__lenderListenersBound) return;
+  if (!nextProvider?.on) return;
+  if (boundProvider && boundProvider !== nextProvider) unbindProvider(boundProvider);
+  if (nextProvider.__lenderListenersBound) {
+    boundProvider = nextProvider;
+    return;
+  }
   nextProvider.__lenderListenersBound = true;
-  nextProvider.on("accountsChanged", (accounts) => {
-    address = accounts?.[0] || null;
-    emit();
-  });
-  nextProvider.on("chainChanged", () => emit());
-  nextProvider.on("disconnect", () => {
-    if (provider === nextProvider) {
-      address = null;
-      provider = null;
-      emit();
-    }
-  });
+  nextProvider.on("accountsChanged", onAccountsChanged);
+  nextProvider.on("chainChanged", onChainChanged);
+  nextProvider.on("disconnect", onDisconnect);
+  boundProvider = nextProvider;
 }
 
 async function getWalletConnectProvider() {
@@ -49,7 +79,6 @@ async function getWalletConnectProvider() {
   if (!isWalletConnectConfigured()) {
     throw new Error("WalletConnect project ID is missing.");
   }
-
   let EthereumProvider;
   try {
     ({ EthereumProvider } = await import(
@@ -58,27 +87,36 @@ async function getWalletConnectProvider() {
   } catch {
     throw new Error("Unable to load WalletConnect. Check your connection and try again.");
   }
-
   walletConnectProvider = await EthereumProvider.init({
     projectId: config.walletConnectProjectId,
     chains: [config.chainId],
     optionalChains: [config.chainId],
     showQrModal: true,
+    methods: [
+      "eth_accounts",
+      "eth_requestAccounts",
+      "eth_sendTransaction",
+      "eth_call",
+      "eth_getBalance",
+      "eth_chainId",
+      "eth_getTransactionReceipt",
+      "wallet_switchEthereumChain",
+    ],
+    events: ["accountsChanged", "chainChanged", "disconnect"],
     rpcMap: { [config.chainId]: config.rpcUrl },
     metadata: {
       name: "Lender",
       description: "NFT-backed USDC credit on Monad",
-      url: "https://lender-swart-zeta.vercel.app",
-      icons: ["https://lender-swart-zeta.vercel.app/favicon.ico"],
+      url: WC_ORIGIN,
+      icons: [`${WC_ORIGIN}/favicon.ico`],
     },
   });
-  bindProviderListeners(walletConnectProvider);
   return walletConnectProvider;
 }
 
-export async function ensureMonad(walletProvider = getProvider()) {
+export async function ensureMonad(walletProvider = provider) {
   if (!walletProvider) {
-    throw new Error("No wallet found. Install a browser wallet or connect with WalletConnect.");
+    throw new Error("Connect a wallet first.");
   }
   try {
     await walletProvider.request({
@@ -107,18 +145,35 @@ export async function ensureMonad(walletProvider = getProvider()) {
       throw err;
     }
   }
+  const chainId = await walletProvider.request({ method: "eth_chainId" });
+  if (String(chainId).toLowerCase() !== config.chainIdHex.toLowerCase()) {
+    throw new Error("Wallet is not on Monad.");
+  }
 }
 
 export async function connectWalletConnect() {
-  provider = await getWalletConnectProvider();
-  await provider.connect();
-  const accounts = await provider.request({ method: "eth_accounts" });
-  if (!accounts?.length) throw new Error("No account returned from WalletConnect");
-  const chainId = await provider.request({ method: "eth_chainId" });
+  const wc = await getWalletConnectProvider();
+  await wc.connect();
+  const accounts =
+    (await wc.request({ method: "eth_requestAccounts" }).catch(() => null)) ||
+    (await wc.request({ method: "eth_accounts" }));
+  if (!accounts?.length) {
+    try {
+      await wc.disconnect();
+    } catch {
+      /* ignore */
+    }
+    walletConnectProvider = null;
+    throw new Error("No account returned from WalletConnect");
+  }
+  const chainId = await wc.request({ method: "eth_chainId" });
   if (String(chainId).toLowerCase() !== config.chainIdHex.toLowerCase()) {
     throw new Error("Reconnect with a WalletConnect wallet set to Monad.");
   }
+  provider = wc;
+  bindProviderListeners(wc);
   address = accounts[0];
+  sessionStorage.setItem(SESSION_KEY, "wc");
   emit();
   return address;
 }
@@ -126,36 +181,50 @@ export async function connectWalletConnect() {
 export async function connectWallet() {
   const injected = getInjectedProvider();
   if (!injected) return connectWalletConnect();
-  provider = injected;
-  bindProviderListeners(provider);
-  await ensureMonad(provider);
-  const accounts = await provider.request({ method: "eth_requestAccounts" });
+  await ensureMonad(injected);
+  const accounts = await injected.request({ method: "eth_requestAccounts" });
   if (!accounts?.length) throw new Error("No account returned");
+  provider = injected;
+  bindProviderListeners(injected);
   address = accounts[0];
+  sessionStorage.setItem(SESSION_KEY, "injected");
   emit();
   return address;
 }
 
 export async function silentConnect() {
   try {
-    if (walletConnectProvider?.session) {
-      provider = walletConnectProvider;
-      const accounts = await provider.request({ method: "eth_accounts" });
-      if (accounts?.length) {
-        address = accounts[0];
-        emit();
-        return address;
+    const last = sessionStorage.getItem(SESSION_KEY);
+    if (last === "wc") {
+      const wc = await getWalletConnectProvider();
+      if (wc.session) {
+        const accounts = await wc.request({ method: "eth_accounts" });
+        const chainId = await wc.request({ method: "eth_chainId" });
+        if (
+          accounts?.length &&
+          String(chainId).toLowerCase() === config.chainIdHex.toLowerCase()
+        ) {
+          provider = wc;
+          bindProviderListeners(wc);
+          address = accounts[0];
+          emit();
+          return address;
+        }
       }
+      return null;
     }
     const injected = getInjectedProvider();
-    if (!injected) return null;
-    provider = injected;
-    bindProviderListeners(provider);
-    const accounts = await provider.request({ method: "eth_accounts" });
-    if (accounts?.length) {
-      address = accounts[0];
-      emit();
+    if (!injected || last === "wc") return null;
+    const accounts = await injected.request({ method: "eth_accounts" });
+    if (!accounts?.length) return null;
+    const chainId = await injected.request({ method: "eth_chainId" });
+    if (String(chainId).toLowerCase() !== config.chainIdHex.toLowerCase()) {
+      return null;
     }
+    provider = injected;
+    bindProviderListeners(injected);
+    address = accounts[0];
+    emit();
   } catch {
     /* ignore */
   }
@@ -166,22 +235,35 @@ export async function disconnectWallet() {
   const active = provider;
   address = null;
   provider = null;
+  sessionStorage.removeItem(SESSION_KEY);
   emit();
-  if (active && walletConnectProvider && (active === walletConnectProvider || active === walletConnectProvider.provider)) {
+  unbindProvider(active);
+  if (walletConnectProvider) {
     try {
       await walletConnectProvider.disconnect();
     } catch {
       /* ignore */
     }
+    walletConnectProvider = null;
   }
 }
 
 export function bindWalletListeners() {
-  bindProviderListeners(getProvider());
+  if (provider) bindProviderListeners(provider);
 }
 
 export async function readChainId() {
-  const p = getProvider();
-  if (!p) return null;
-  return p.request({ method: "eth_chainId" });
+  if (!provider) return null;
+  return provider.request({ method: "eth_chainId" });
+}
+
+export async function assertActiveAccount(from) {
+  if (!provider) throw new Error("Connect a wallet first");
+  const accounts = await provider.request({ method: "eth_accounts" });
+  const ok = (accounts || []).some((a) => a.toLowerCase() === String(from).toLowerCase());
+  if (!ok) throw new Error("Connected wallet does not match the signer");
+  const chainId = await provider.request({ method: "eth_chainId" });
+  if (String(chainId).toLowerCase() !== config.chainIdHex.toLowerCase()) {
+    throw new Error("Wallet is not on Monad.");
+  }
 }

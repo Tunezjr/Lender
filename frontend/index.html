@@ -74,6 +74,7 @@
             <span id="network-label">Wrong network</span>
           </span>
           <button type="button" class="btn-cta" id="wallet-btn">Connect Wallet</button>
+          <button type="button" class="btn-ghost" id="wc-btn">WalletConnect</button>
         </div>
       </div>
     </header>
@@ -279,11 +280,11 @@
                 <div class="terms__row"><span>Mera vault</span><span class="mono-numeric" id="sum-vault">Not created</span></div>
               </div>
               <p class="card__subtitle" id="vault-hint">
-                Confirm creates a passkey vault, moves the NFT into it, then originates the loan from that vault.
+                Confirm approves this NFT to the pool, then borrows USDC into the connected wallet.
               </p>
               <div class="wizard__nav">
                 <button type="button" class="btn-ghost" data-wizard-back="2">Back</button>
-                <button type="button" class="btn-primary" id="borrow-confirm">Create vault & lock NFT</button>
+                <button type="button" class="btn-primary" id="borrow-confirm">Confirm borrow</button>
               </div>
               <p class="status" id="borrow-status" role="status"></p>
             </div>

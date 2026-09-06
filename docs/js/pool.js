@@ -1,5 +1,5 @@
 import { config, fromUsdcUnits, isHexAddress, isTokenId } from "./config.js";
-import { getAddress, getProvider, ensureMonad } from "./wallet.js";
+import { getAddress, getProvider, ensureMonad, assertActiveAccount } from "./wallet.js";
 
 const SEL = {
   ownerOf: "0x6352211e",
@@ -40,46 +40,46 @@ export async function walletCall(tx) {
   return provider.request(tx);
 }
 
-export async function ethCall(to, data) {
-  const provider = getProvider();
-  if (provider) {
-    await ensureMonad(provider);
-    return provider.request({
-      method: "eth_call",
-      params: [{ to, data }, "latest"],
-    });
-  }
+async function rpc(method, params) {
   const res = await fetch(config.rpcUrl, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: 1,
-      method: "eth_call",
-      params: [{ to, data }, "latest"],
-    }),
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
   });
   const json = await res.json();
   if (json.error) throw new Error(json.error.message);
   return json.result;
 }
 
-export async function sendTx(to, data) {
+export async function ethCall(to, data) {
+  return rpc("eth_call", [{ to, data }, "latest"]);
+}
+
+export async function sendTx(to, data, value = "0x0") {
   const from = getAddress();
   if (!from) throw new Error("Connect a Monad wallet first");
+  await assertActiveAccount(from);
+  const allowed = new Set([
+    config.lendPoolAddress.toLowerCase(),
+    config.usdcAddress.toLowerCase(),
+  ]);
+  if (!allowed.has(String(to).toLowerCase()) && value === "0x0") {
+    // NFT approve / collection calls must be a listed collection
+    const listed = (await import("./config.js")).COLLECTIONS.some(
+      (c) => c.address.toLowerCase() === String(to).toLowerCase()
+    );
+    if (!listed) throw new Error("Refusing to send to an unknown contract");
+  }
   const hash = await walletCall({
     method: "eth_sendTransaction",
-    params: [{ from, to, data, chainId: config.chainIdHex }],
+    params: [{ from, to, data, value, chainId: config.chainIdHex }],
   });
   return waitReceipt(hash);
 }
 
 export async function waitReceipt(hash) {
   for (let i = 0; i < 60; i++) {
-    const rec = await walletCall({
-      method: "eth_getTransactionReceipt",
-      params: [hash],
-    });
+    const rec = await rpc("eth_getTransactionReceipt", [hash]);
     if (rec) {
       if (rec.status === "0x1") return { hash, receipt: rec };
       throw new Error(`Transaction reverted (${hash})`);
@@ -160,16 +160,13 @@ async function ensureErc20Allowance(token, spender, amount) {
 }
 
 async function ensureNftApproved(nft, tokenId) {
-  const owner = getAddress();
-  const raw = await ethCall(
-    nft,
-    SEL.isApprovedForAll + padAddr(owner) + padAddr(config.lendPoolAddress)
-  );
-  const approved = raw && raw !== "0x" && word(raw, 0) === 1n;
-  if (approved) return null;
+  const getApproved = "0x081812fc";
+  const approved = await ethCall(nft, getApproved + padUint(tokenId));
+  const who = approved && approved !== "0x" ? "0x" + approved.slice(-40) : "";
+  if (who.toLowerCase() === config.lendPoolAddress.toLowerCase()) return null;
   return sendTx(
     nft,
-    SEL.setApprovalForAll + padAddr(config.lendPoolAddress) + padBool(true)
+    SEL.approve721 + padAddr(config.lendPoolAddress) + padUint(tokenId)
   );
 }
 
