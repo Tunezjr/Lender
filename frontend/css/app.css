@@ -10,16 +10,14 @@ body {
   font-family: var(--font-display);
   font-weight: var(--font-weight-body);
   font-size: var(--text-sm);
-  line-height: 1.35;
+  line-height: 1.5;
   color: var(--navy-ink);
   background: var(--cream);
   position: relative;
 }
-h1, h2, h3, h4, p, a, button, label, summary, span, strong, li, .nav-link, .brand__name, .section-kicker, .pill, .tab, .btn-cta, .btn-ghost, .btn-primary, .theme-cycle {
-  font-family: var(--font-display);
-  font-weight: 400;
-}
 h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-display);
   letter-spacing: var(--letter-spacing-heading);
   text-wrap: balance;
 }
@@ -28,6 +26,37 @@ h1, h2, h3 {
 .mono-numeric,
 code {
   font-family: var(--font-mono);
+}
+
+/* Raffishly stand-in: boxed copy only, not titles */
+.card p,
+.card .status,
+.card__subtitle,
+.banner,
+.status,
+.connect-dialog__lede,
+.connect-dialog .status,
+.faq__item .scroll-line,
+.nft-empty,
+.nft-pick p {
+  font-family: var(--font-script);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  -webkit-text-stroke: 0.55px currentColor;
+  paint-order: stroke fill;
+  font-size: 22px;
+  line-height: 1.25;
+}
+.card .terms__row span:last-child,
+.stat strong,
+.loan strong {
+  font-family: var(--font-mono);
+  text-transform: none;
+  -webkit-text-stroke: 0;
+  font-weight: 500;
+  letter-spacing: 0;
+  font-size: inherit;
 }
 p { text-wrap: pretty; }
 a { color: var(--indigo); text-decoration: none; }
@@ -78,7 +107,7 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   color: var(--on-primary);
   box-shadow: var(--shadow-cta);
 }
-.brand__name { font-size: 26px; font-weight: 400; }
+.brand__name { font-size: 16px; font-weight: 500; }
 
 .header-nav { display: none; align-items: center; gap: 2px; margin-left: 8px; }
 @media (min-width: 768px) { .header-nav { display: flex; } }
@@ -177,10 +206,10 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 
 .hero h1 {
   margin: 0 0 18px;
-  font-size: clamp(48px, 9vw, 80px);
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  line-height: 1.12;
+  font-size: clamp(36px, 7vw, 56px);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
   color: var(--navy-ink);
 }
 .hero__lede {
