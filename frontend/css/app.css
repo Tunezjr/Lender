@@ -758,3 +758,99 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.connect-dialog {
+  padding: 0;
+  border: none;
+  background: transparent;
+  max-width: calc(100% - 2rem);
+}
+.connect-dialog::backdrop {
+  background: color-mix(in srgb, var(--navy-ink) 40%, transparent);
+}
+.connect-dialog__panel {
+  width: min(100vw - 2rem, 420px);
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--light-surface);
+  color: var(--navy-ink);
+  box-shadow: var(--shadow-lift);
+}
+.connect-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.connect-dialog__head h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+}
+.connect-dialog__close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--light-text-secondary);
+  font-size: 22px;
+  line-height: 1;
+}
+.connect-dialog__close:hover {
+  background: var(--light-surface-sunken);
+  color: var(--navy-ink);
+}
+.connect-dialog__lede {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--light-text-secondary);
+  line-height: 1.5;
+}
+.connect-options {
+  display: grid;
+  gap: 10px;
+}
+.connect-option {
+  text-align: left;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--light-surface-sunken);
+  box-shadow: var(--shadow-border);
+  color: var(--navy-ink);
+}
+.connect-option:hover {
+  box-shadow: var(--shadow-border-hover);
+}
+.connect-option strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.connect-option span {
+  font-size: 13px;
+  color: var(--light-text-secondary);
+}
+.connect-qr {
+  text-align: center;
+}
+.connect-qr canvas {
+  display: block;
+  margin: 0 auto 12px;
+  width: 280px;
+  height: 280px;
+  max-width: 100%;
+  border-radius: 12px;
+  background: #fff9f0;
+}
+.connect-qr p {
+  margin: 0 0 10px;
+  color: var(--light-text-secondary);
+  font-size: 13px;
+}
+.connect-qr .btn-ghost {
+  margin: 0 auto 8px;
+}

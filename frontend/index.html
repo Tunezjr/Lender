@@ -80,7 +80,6 @@
             <span id="network-label">Wrong network</span>
           </span>
           <button type="button" class="btn-cta" id="wallet-btn">Connect Wallet</button>
-          <button type="button" class="btn-ghost" id="wc-btn">WalletConnect</button>
         </div>
       </div>
     </header>
@@ -232,6 +231,33 @@
       </section>
     </main>
     <footer class="site-footer"><div class="site-footer__inner"><span class="brand__name">Lender</span></div></footer>
+    <dialog class="connect-dialog" id="connect-dialog" aria-labelledby="connect-title">
+      <div class="connect-dialog__panel">
+        <div class="connect-dialog__head">
+          <h2 id="connect-title">Connect wallet</h2>
+          <button type="button" class="connect-dialog__close" id="connect-close" aria-label="Close">×</button>
+        </div>
+        <p class="connect-dialog__lede" id="connect-lede">Choose how to connect. Browser wallets stay in this tab. WalletConnect uses a QR code.</p>
+        <div class="connect-options" id="connect-options">
+          <button type="button" class="connect-option" id="connect-injected">
+            <strong>Browser wallet</strong>
+            <span>MetaMask, Rabby, Coinbase Wallet, and other injected wallets</span>
+          </button>
+          <button type="button" class="connect-option" id="connect-wc">
+            <strong>WalletConnect</strong>
+            <span>Scan a QR code with a mobile wallet</span>
+          </button>
+        </div>
+        <div class="connect-qr" id="connect-qr" hidden>
+          <canvas id="connect-qr-canvas" width="280" height="280"></canvas>
+          <p>Open your wallet and scan this code.</p>
+          <a class="btn-ghost" id="connect-wc-link" href="#" hidden>Open in wallet</a>
+          <button type="button" class="linkish" id="connect-qr-back">Back to options</button>
+          <p class="status" id="connect-qr-status" role="status"></p>
+        </div>
+        <p class="status" id="connect-status" role="status"></p>
+      </div>
+    </dialog>
     <script type="module" src="./js/theme.js"></script>
     <script type="module" src="./js/grove.js"></script>
     <script type="module" src="./js/app.js"></script>
