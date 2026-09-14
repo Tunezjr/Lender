@@ -28,9 +28,7 @@ function applyTheme(id) {
     /* ignore */
   }
   const current = THEMES.find((t) => t.id === id) || THEMES[0];
-  const label = document.getElementById("theme-label");
   const btn = document.getElementById("theme-cycle");
-  if (label) label.textContent = current.label;
   if (btn) {
     const i = THEMES.findIndex((t) => t.id === id);
     const next = THEMES[(i + 1) % THEMES.length];

@@ -55,6 +55,12 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   .site-header__inner { padding: 0 var(--gutter-desktop); }
 }
 
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
 .brand {
   display: flex;
   align-items: center;
@@ -70,11 +76,11 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  background: var(--indigo);
+  background: #ffd771;
   display: grid;
   place-items: center;
-  color: var(--on-primary);
-  box-shadow: var(--shadow-cta);
+  color: #200041;
+  box-shadow: 0 8px 20px rgba(255, 215, 113, 0.35);
 }
 .brand__name { font-size: 16px; font-weight: 500; }
 
@@ -729,41 +735,31 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 
 
 .theme-cycle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 4px 12px 4px 8px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  padding: 0;
   border: none;
-  border-radius: var(--radius-pill);
-  background: var(--light-surface);
-  color: var(--light-text-secondary);
-  box-shadow: var(--shadow-border);
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color .15s var(--ease-standard), box-shadow .15s var(--ease-standard);
-}
-.theme-cycle:hover {
-  color: var(--indigo);
-  box-shadow: var(--shadow-border-hover);
-}
-.theme-cycle__swatch {
-  width: 12px;
-  height: 12px;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--indigo), var(--sherbet-orange));
+  background: transparent;
+  cursor: pointer;
   flex-shrink: 0;
 }
-.theme-cycle__label {
-  max-width: 7.5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.theme-cycle:hover { opacity: 0.85; }
+.theme-cycle__swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #533afd;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--navy-ink) 14%, transparent);
 }
+html.theme-grove .theme-cycle__swatch { background: #533afd; }
+html.theme-neverland .theme-cycle__swatch { background: #ffd771; }
+html.theme-skull-rock .theme-cycle__swatch { background: #ff6b35; }
+html.theme-mermaid-lagoon .theme-cycle__swatch { background: #00d4e8; }
+html.theme-second-star .theme-cycle__swatch { background: #d4b8ff; }
 
 .connect-dialog {
   padding: 0;
