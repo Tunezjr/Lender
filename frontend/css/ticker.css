@@ -1,6 +1,6 @@
 /* Single-line Stripe tickers inside cards */
 .scroll-line {
-  margin-top: 10px;
+  margin-top: 8px;
   overflow: hidden;
 }
 .ticker-track {
@@ -15,7 +15,9 @@
 .ticker-track span {
   flex: 0 0 auto;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 400;
   font-style: italic;
   color: var(--light-text-secondary);
 }
