@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="theme-grove">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -14,20 +14,6 @@
     <link rel="stylesheet" href="./css/design-tokens.css" />
     <link rel="stylesheet" href="./css/app.css" />
     <link rel="stylesheet" href="./css/ticker.css" />
-    <script>
-      (function () {
-        try {
-          var k = 'lender-neverland-theme';
-          var id = localStorage.getItem(k) || 'grove';
-          var ok = ['grove', 'neverland', 'skull-rock', 'mermaid-lagoon', 'second-star'];
-          if (ok.indexOf(id) < 0) id = 'grove';
-          document.documentElement.classList.add('theme-' + id);
-          document.documentElement.dataset.theme = id;
-        } catch (e) {
-          document.documentElement.classList.add('theme-grove');
-        }
-      })();
-    </script>
   </head>
   <body>
     <div class="grove-stage" aria-hidden="true">
@@ -57,17 +43,12 @@
     </div>
     <header class="site-header">
       <div class="site-header__inner">
-        <div class="brand-cluster">
-          <a class="brand" href="./">
-            <span class="brand__mark" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-            </span>
-            <span class="brand__name">Lender</span>
-          </a>
-          <button type="button" class="theme-cycle" id="theme-cycle" aria-label="Cycle colour theme">
-            <span class="theme-cycle__swatch" id="theme-swatch"></span>
-          </button>
-        </div>
+        <a class="brand" href="./">
+          <span class="brand__mark" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          </span>
+          <span class="brand__name">Lender</span>
+        </a>
         <nav class="header-nav" aria-label="Primary">
           <a class="nav-link" href="#benefits">Benefits</a>
           <a class="nav-link" href="#how">How it works</a>
@@ -81,6 +62,7 @@
             <span id="network-label">Wrong network</span>
           </span>
           <button type="button" class="btn-cta" id="wallet-btn">Connect Wallet</button>
+          <button type="button" class="btn-ghost" id="wc-btn">WalletConnect</button>
         </div>
       </div>
     </header>
@@ -117,7 +99,7 @@
         <h2 class="section-title">Borrow, supply, manage</h2>
         <p class="section-lede">Pick collateral, draw USDC, and repay.</p>
         <div class="stats" aria-label="Pool stats">
-          <div class="stat"><p>Pool TVL</p><strong id="stat-tvl">$8,500.00</strong></div>
+          <div class="stat"><p>Pool TVL</p><strong id="stat-tvl">$1,240,000.00</strong></div>
           <div class="stat"><p>Your supply</p><strong id="stat-supply">$0.00</strong></div>
           <div class="stat"><p>Open loans</p><strong id="stat-loans">0</strong></div>
         </div>
@@ -232,34 +214,6 @@
       </section>
     </main>
     <footer class="site-footer"><div class="site-footer__inner"><span class="brand__name">Lender</span></div></footer>
-    <dialog class="connect-dialog" id="connect-dialog" aria-labelledby="connect-title">
-      <div class="connect-dialog__panel">
-        <div class="connect-dialog__head">
-          <h2 id="connect-title">Connect wallet</h2>
-          <button type="button" class="connect-dialog__close" id="connect-close" aria-label="Close">×</button>
-        </div>
-        <p class="connect-dialog__lede" id="connect-lede">Choose how to connect. Browser wallets stay in this tab. WalletConnect uses a QR code.</p>
-        <div class="connect-options" id="connect-options">
-          <button type="button" class="connect-option" id="connect-injected">
-            <strong>Browser wallet</strong>
-            <span>MetaMask, Rabby, Coinbase Wallet, and other injected wallets</span>
-          </button>
-          <button type="button" class="connect-option" id="connect-wc">
-            <strong>WalletConnect</strong>
-            <span>Scan a QR code with a mobile wallet</span>
-          </button>
-        </div>
-        <div class="connect-qr" id="connect-qr" hidden>
-          <canvas id="connect-qr-canvas" width="280" height="280"></canvas>
-          <p>Open your wallet and scan this code.</p>
-          <a class="btn-ghost" id="connect-wc-link" href="#" hidden>Open in wallet</a>
-          <button type="button" class="linkish" id="connect-qr-back">Back to options</button>
-          <p class="status" id="connect-qr-status" role="status"></p>
-        </div>
-        <p class="status" id="connect-status" role="status"></p>
-      </div>
-    </dialog>
-    <script type="module" src="./js/theme.js"></script>
     <script type="module" src="./js/grove.js"></script>
     <script type="module" src="./js/app.js"></script>
   </body>
