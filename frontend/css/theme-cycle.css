@@ -1,0 +1,38 @@
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.theme-cycle {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+.theme-cycle:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 2px;
+}
+.theme-cycle__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--indigo);
+  box-shadow: 0 0 0 1px var(--border-subtle-light);
+}
+html.theme-grove .theme-cycle__swatch { background: #533afd; }
+html.theme-neverland .theme-cycle__swatch { background: #ffd771; }
+html.theme-skull-rock .theme-cycle__swatch { background: #ff6b35; }
+html.theme-mermaid-lagoon .theme-cycle__swatch { background: #00d4e8; }
+html.theme-second-star .theme-cycle__swatch { background: #d4b8ff; }
+.brand__mark {
+  background: #ffd771 !important;
+  color: #200041 !important;
+}
