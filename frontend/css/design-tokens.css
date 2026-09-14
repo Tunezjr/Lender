@@ -54,21 +54,21 @@
   --radius-xl: 24px;
   --radius-pill: 9999px;
 
-  --font-display: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Allura", "Great Vibes", cursive;
   --font-mono: "JetBrains Mono", "SF Mono", monospace;
-  --font-weight-display: 300;
+  --font-weight-display: 400;
   --font-weight-body: 400;
-  --font-weight-medium: 500;
-  --letter-spacing-heading: -0.03em;
+  --font-weight-medium: 400;
+  --letter-spacing-heading: 0.02em;
 
-  --text-caption: 12px;
-  --text-mini: 13px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 20px;
-  --text-xl: 28px;
-  --text-2xl: 40px;
-  --text-3xl: 56px;
+  --text-caption: 18px;
+  --text-mini: 20px;
+  --text-sm: 22px;
+  --text-base: 24px;
+  --text-lg: 30px;
+  --text-xl: 40px;
+  --text-2xl: 56px;
+  --text-3xl: 72px;
 
   --shadow-border:
     0px 0px 0px 1px rgba(13, 37, 61, 0.06),

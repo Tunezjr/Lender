@@ -10,16 +10,24 @@ body {
   font-family: var(--font-display);
   font-weight: var(--font-weight-body);
   font-size: var(--text-sm);
-  line-height: 1.5;
+  line-height: 1.35;
   color: var(--navy-ink);
   background: var(--cream);
   position: relative;
 }
-h1, h2, h3 {
+h1, h2, h3, h4, p, a, button, label, summary, span, strong, li, .nav-link, .brand__name, .section-kicker, .pill, .tab, .btn-cta, .btn-ghost, .btn-primary, .theme-cycle {
   font-family: var(--font-display);
-  font-weight: var(--font-weight-display);
+  font-weight: 400;
+}
+h1, h2, h3 {
   letter-spacing: var(--letter-spacing-heading);
   text-wrap: balance;
+}
+.field input,
+.terms__row input,
+.mono-numeric,
+code {
+  font-family: var(--font-mono);
 }
 p { text-wrap: pretty; }
 a { color: var(--indigo); text-decoration: none; }
@@ -70,7 +78,7 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   color: var(--on-primary);
   box-shadow: var(--shadow-cta);
 }
-.brand__name { font-size: 16px; font-weight: 500; }
+.brand__name { font-size: 26px; font-weight: 400; }
 
 .header-nav { display: none; align-items: center; gap: 2px; margin-left: 8px; }
 @media (min-width: 768px) { .header-nav { display: flex; } }
@@ -169,10 +177,10 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 
 .hero h1 {
   margin: 0 0 18px;
-  font-size: clamp(36px, 7vw, 56px);
-  font-weight: 300;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  font-size: clamp(48px, 9vw, 80px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.12;
   color: var(--navy-ink);
 }
 .hero__lede {
