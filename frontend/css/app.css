@@ -721,3 +721,40 @@ button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   opacity: 0.35;
 }
 
+
+.theme-cycle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 4px 12px 4px 8px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--light-surface);
+  color: var(--light-text-secondary);
+  box-shadow: var(--shadow-border);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color .15s var(--ease-standard), box-shadow .15s var(--ease-standard);
+}
+.theme-cycle:hover {
+  color: var(--indigo);
+  box-shadow: var(--shadow-border-hover);
+}
+.theme-cycle__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--indigo), var(--sherbet-orange));
+  flex-shrink: 0;
+}
+.theme-cycle__label {
+  max-width: 7.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
