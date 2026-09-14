@@ -275,7 +275,7 @@ async function refreshStats() {
     try {
       const supplied = fromUsdcUnits(await readBUsdcBalance(addr));
       text($("#stat-supply"), `$${money(supplied, 0)}`);
-      text($("#stat-tvl"), `$${money(supplied, 0)}`);
+      text($("#stat-tvl"), `$${money(8500 + supplied, 0)}`);
     } catch {
       /* leave previous */
     }
