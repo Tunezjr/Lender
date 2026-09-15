@@ -361,7 +361,6 @@ html.theme-second-star {
   --shadow-lift: 0 18px 50px -18px rgba(0, 0, 0, 0.5);
 }
 
-html:not(.theme-grove) .grove-still,
-html:not(.theme-grove) .grove-film {
-  filter: saturate(0.7) contrast(1.05) brightness(0.45);
+html:not(.theme-grove) .grove-stage {
+  display: none;
 }

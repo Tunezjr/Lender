@@ -12,6 +12,10 @@ import {
 import { readDustLock } from "./vedust.js";
 import {
   connectWallet,
+  connectWalletConnect,
+  connectInjected,
+  discoverInjected,
+  renderWalletConnectQr,
   silentConnect,
   disconnectWallet,
   onWalletChange,
@@ -295,7 +299,7 @@ function initBorrowWizard() {
     const status = $("#borrow-step1-status");
     const draft = readBorrowDraft();
     try {
-      if (!getAddress()) await connectWallet();
+      requireWallet();
       if (!isHexAddress(draft.collection)) {
         throw new Error("Select a listed collection");
       }
@@ -340,7 +344,7 @@ function initBorrowWizard() {
     const status = $("#borrow-status");
     const { principal, draft } = updateTermsQuote();
     try {
-      if (!getAddress()) await connectWallet();
+      requireWallet();
       setStatus(status, "Approve the NFT, then confirm borrow in your wallet. USDC goes to this wallet.");
       const { borrowUsdc } = await import("./pool.js");
       const result = await borrowUsdc(draft.collection, draft.tokenId, principal);
@@ -390,6 +394,12 @@ function initBorrowWizard() {
   setWizardStep(1);
 }
 
+function requireWallet() {
+  if (getAddress()) return;
+  openConnectDialog();
+  throw new Error("Connect a wallet first");
+}
+
 function wireConnectButton(btn) {
   if (!btn) return;
   btn.addEventListener("click", async () => {
@@ -398,9 +408,111 @@ function wireConnectButton(btn) {
         await disconnectWallet();
         return;
       }
-      await connectWallet();
+      openConnectDialog();
     } catch (e) {
       alert(e?.message || "Wallet connection failed");
+    }
+  });
+}
+
+function setConnectStatus(message, kind) {
+  const el = $("#connect-status");
+  if (!el) return;
+  el.textContent = message || "";
+  el.classList.remove("status--ok", "status--err");
+  if (kind === "ok") el.classList.add("status--ok");
+  if (kind === "err") el.classList.add("status--err");
+}
+
+function showConnectOptions() {
+  $("#connect-options")?.removeAttribute("hidden");
+  $("#connect-qr")?.setAttribute("hidden", "");
+  const lede = $("#connect-lede");
+  if (lede) {
+    lede.textContent =
+      "Choose how to connect. Browser wallets stay in this tab. WalletConnect uses a QR code.";
+  }
+  setConnectStatus("");
+}
+
+function openConnectDialog() {
+  const dialog = $("#connect-dialog");
+  if (!dialog) {
+    void connectWallet();
+    return;
+  }
+  showConnectOptions();
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
+}
+
+function closeConnectDialog() {
+  const dialog = $("#connect-dialog");
+  if (!dialog) return;
+  if (typeof dialog.close === "function") dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+function initConnectDialog() {
+  const dialog = $("#connect-dialog");
+  if (!dialog) return;
+
+  $("#connect-close")?.addEventListener("click", () => closeConnectDialog());
+  $("#connect-qr-back")?.addEventListener("click", () => showConnectOptions());
+  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) closeConnectDialog();
+  });
+
+  $("#connect-injected")?.addEventListener("click", async () => {
+    setConnectStatus("Opening your browser wallet…");
+    try {
+      const wallets = await discoverInjected();
+      if (!wallets.length) {
+        throw new Error("No browser wallet found. Install MetaMask or Rabby, or use WalletConnect.");
+      }
+      await connectInjected(wallets[0].provider, wallets[0].rdns);
+      closeConnectDialog();
+    } catch (err) {
+      if (err?.code === 4001) setConnectStatus("Request rejected in the wallet.", "err");
+      else setConnectStatus(err?.message || "Browser wallet failed", "err");
+    }
+  });
+
+  $("#connect-wc")?.addEventListener("click", async () => {
+    const options = $("#connect-options");
+    const qrBox = $("#connect-qr");
+    const canvas = $("#connect-qr-canvas");
+    const link = $("#connect-wc-link");
+    const lede = $("#connect-lede");
+    options?.setAttribute("hidden", "");
+    qrBox?.removeAttribute("hidden");
+    if (lede) lede.textContent = "Scan with a WalletConnect wallet.";
+    setConnectStatus("Waiting for WalletConnect…");
+    try {
+      await connectWalletConnect({
+        onUri: async (uri) => {
+          if (canvas) {
+            try {
+              await renderWalletConnectQr(uri, canvas);
+            } catch {
+              /* canvas optional */
+            }
+          }
+          if (link && /^wc:/i.test(uri)) {
+            link.href = uri;
+            link.hidden = false;
+          }
+          setConnectStatus("Scan the code, then approve in your wallet.");
+        },
+      });
+      closeConnectDialog();
+    } catch (err) {
+      showConnectOptions();
+      if (/reset|closed|rejected|denied/i.test(String(err?.message || ""))) {
+        setConnectStatus("WalletConnect cancelled.", "err");
+      } else {
+        setConnectStatus(err?.message || "WalletConnect failed", "err");
+      }
     }
   });
 }
@@ -430,6 +542,7 @@ function initWalletUi() {
 
   wireConnectButton(btn);
   wireConnectButton(heroBtn);
+  initConnectDialog();
 
   async function refreshNetwork() {
     if (!netDot || !netLabel) return;
@@ -477,7 +590,7 @@ function initForms() {
     const amount = String(fd.get("amount") || "").trim();
     const supplyStatus = $("#supply-status");
     try {
-      if (!getAddress()) await connectWallet();
+      requireWallet();
       setStatus(supplyStatus, "Confirm the USDC approval and deposit in your wallet…");
       const result = await supplyUsdc(amount);
       e.target.reset();
@@ -496,7 +609,7 @@ function initForms() {
     const btn = e.target.closest("[data-collection][data-token-id]");
     if (!btn) return;
     try {
-      if (!getAddress()) await connectWallet();
+      requireWallet();
       const result = await repayLoan(btn.dataset.collection, btn.dataset.tokenId);
       alert(`Repay submitted. ${explorerTx(result.repay.hash)}`);
       void refreshStats();
