@@ -169,7 +169,11 @@
             <div class="card card--wide" data-wizard-panel="1">
               <h2 class="card__title">Select NFT</h2>
               <p class="card__subtitle">Pick collateral from a known collection, or enter a custom token.</p>
-              <div class="nft-grid" id="nft-grid"></div>
+              <div class="nft-wheel">
+                <button type="button" class="nft-wheel__nav" id="nft-prev" aria-label="Previous collection">‹</button>
+                <div class="nft-wheel__stage" id="nft-grid" tabindex="0" role="listbox" aria-label="NFT collections"></div>
+                <button type="button" class="nft-wheel__nav" id="nft-next" aria-label="Next collection">›</button>
+              </div>
               <button type="button" class="linkish" id="toggle-custom">Use a different collection</button>
               <div class="custom-fields" id="custom-fields" hidden>
                 <div class="field"><label for="borrow-collection">Collection address</label><input id="borrow-collection" name="collection" placeholder="0x…" autocomplete="off" spellcheck="false" /></div>

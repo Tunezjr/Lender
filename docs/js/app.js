@@ -172,6 +172,7 @@ function renderNftGrid() {
     btn.type = "button";
     btn.className = `nft-pick${c.live ? "" : " nft-pick--soon"}`;
     btn.dataset.id = c.id;
+    btn.setAttribute("role", "option");
     if (!c.live) btn.disabled = true;
     const face = document.createElement("div");
     face.className = `nft-face nft-face--${c.id}`;
@@ -183,16 +184,85 @@ function renderNftGrid() {
     const meta = document.createElement("span");
     meta.textContent =
       c.valuation === "locked-dust"
-        ? "Pool prices the collection; lock shown for reference"
-        : `${c.items.toLocaleString()} items · ${c.floorMon.toLocaleString()} MON floor`;
+        ? "Locked DUST"
+        : `${c.floorMon.toLocaleString()} MON`;
     btn.append(face, title, meta);
     btn.addEventListener("click", () => selectCollection(c, btn));
     grid.append(btn);
   });
+  layoutNftWheel();
+  wireNftWheel();
+  const first = COLLECTIONS[0];
+  const firstBtn = grid.querySelector(".nft-pick");
+  if (first && firstBtn) selectCollection(first, firstBtn);
+}
+
+let nftIndex = 0;
+let nftWheelWired = false;
+
+function wrapIndex(i, n) {
+  return ((i % n) + n) % n;
+}
+
+function slotFor(j, selected, n) {
+  let d = j - selected;
+  if (d > n / 2) d -= n;
+  if (d < -n / 2) d += n;
+  if (Math.abs(d) > 2) return "hidden";
+  return String(d);
+}
+
+function layoutNftWheel() {
+  const n = COLLECTIONS.length;
+  nftIndex = wrapIndex(nftIndex, n);
+  $$(".nft-pick").forEach((el, j) => {
+    el.dataset.slot = slotFor(j, nftIndex, n);
+    el.classList.toggle("is-selected", j === nftIndex);
+    el.setAttribute("aria-selected", j === nftIndex ? "true" : "false");
+  });
+}
+
+function rotateNft(delta) {
+  const n = COLLECTIONS.length;
+  nftIndex = wrapIndex(nftIndex + delta, n);
+  layoutNftWheel();
+  const c = COLLECTIONS[nftIndex];
+  const btn = $$(`.nft-pick`)[nftIndex];
+  if (c && btn) selectCollection(c, btn);
+}
+
+function wireNftWheel() {
+  if (nftWheelWired) return;
+  nftWheelWired = true;
+  $("#nft-prev")?.addEventListener("click", () => rotateNft(-1));
+  $("#nft-next")?.addEventListener("click", () => rotateNft(1));
+  const stage = $("#nft-grid");
+  if (!stage) return;
+  stage.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      rotateNft(-1);
+    }
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      rotateNft(1);
+    }
+  });
+  let startX = 0;
+  stage.addEventListener("pointerdown", (e) => {
+    startX = e.clientX;
+  });
+  stage.addEventListener("pointerup", (e) => {
+    const dx = e.clientX - startX;
+    if (dx > 36) rotateNft(-1);
+    else if (dx < -36) rotateNft(1);
+  });
 }
 
 function selectCollection(c, btn) {
-  $$(".nft-pick").forEach((el) => el.classList.toggle("is-selected", el === btn));
+  const idx = COLLECTIONS.findIndex((x) => x.id === c.id);
+  if (idx >= 0) nftIndex = idx;
+  layoutNftWheel();
   const col = $("#borrow-collection");
   const tok = $("#borrow-token");
   const val = $("#borrow-value");
