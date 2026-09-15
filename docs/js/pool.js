@@ -1,4 +1,4 @@
-import { config, fromUsdcUnits, isHexAddress, isTokenId } from "./config.js";
+import { COLLECTIONS, config, fromUsdcUnits, isHexAddress, isTokenId } from "./config.js";
 import { getAddress, getProvider, ensureMonad, assertActiveAccount } from "./wallet.js";
 
 const SEL = {
@@ -59,20 +59,24 @@ export async function sendTx(to, data, value = "0x0") {
   const from = getAddress();
   if (!from) throw new Error("Connect a Monad wallet first");
   await assertActiveAccount(from);
+  const target = String(to).toLowerCase();
   const allowed = new Set([
     config.lendPoolAddress.toLowerCase(),
     config.usdcAddress.toLowerCase(),
   ]);
-  if (!allowed.has(String(to).toLowerCase()) && value === "0x0") {
-    // NFT approve / collection calls must be a listed collection
-    const listed = (await import("./config.js")).COLLECTIONS.some(
-      (c) => c.address.toLowerCase() === String(to).toLowerCase()
-    );
-    if (!listed) throw new Error("Refusing to send to an unknown contract");
+  COLLECTIONS.forEach((c) => allowed.add(c.address.toLowerCase()));
+  try {
+    const rec = JSON.parse(localStorage.getItem("lender-mera-vault-v1") || "null");
+    if (rec?.address) allowed.add(String(rec.address).toLowerCase());
+  } catch {
+    /* ignore */
+  }
+  if (!allowed.has(target)) {
+    throw new Error("Refusing to send to an unknown contract");
   }
   const hash = await walletCall({
     method: "eth_sendTransaction",
-    params: [{ from, to, data, value, chainId: config.chainIdHex }],
+    params: [{ from, to, data, value: value || "0x0", chainId: config.chainIdHex }],
   });
   return waitReceipt(hash);
 }
@@ -90,6 +94,7 @@ export async function waitReceipt(hash) {
 }
 
 export function explorerTx(hash) {
+  if (!/^0x[a-fA-F0-9]{64}$/.test(String(hash || ""))) return config.explorerUrl;
   return `${config.explorerUrl}/tx/${hash}`;
 }
 

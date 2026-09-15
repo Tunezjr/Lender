@@ -18,7 +18,7 @@ export const config = Object.freeze({
   loanDays: 7,
   usdcDecimals: 6,
   feePercent: 3,
-  walletConnectProjectId: "429370f458176860b6462c5c0aa74886",
+  walletConnectProjectId: "4f449ee86c846a6430127ea1ca68d6d4",
 });
 
 export const DUST = Object.freeze({

@@ -254,6 +254,7 @@
         </div>
         <p class="connect-dialog__lede" id="connect-lede">Choose how to connect. Browser wallets stay in this tab. WalletConnect uses a QR code.</p>
         <div class="connect-options" id="connect-options">
+          <div id="connect-injected-list" class="connect-injected-list"></div>
           <button type="button" class="connect-option" id="connect-injected">
             <strong>Browser wallet</strong>
             <span>MetaMask, Rabby, Coinbase Wallet, and other injected wallets</span>
@@ -282,7 +283,11 @@
         if (!line) return;
         const track = document.createElement("div");
         track.className = "ticker-track ticker-track--slow";
-        track.innerHTML = Array.from({ length: 8 }, () => "<span>" + line.replace(/</g, "") + "</span>").join("");
+        for (let i = 0; i < 8; i += 1) {
+          const span = document.createElement("span");
+          span.textContent = line;
+          track.append(span);
+        }
         el.replaceChildren(track);
       });
     </script>

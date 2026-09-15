@@ -11,11 +11,12 @@ import {
 } from "./config.js";
 import { readDustLock } from "./vedust.js";
 import {
-  connectWallet,
   connectWalletConnect,
   connectInjected,
   discoverInjected,
   renderWalletConnectQr,
+  abortWalletConnect,
+  isWcV2Uri,
   silentConnect,
   disconnectWallet,
   onWalletChange,
@@ -50,7 +51,8 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 function loadPositions() {
   try {
     const raw = JSON.parse(localStorage.getItem(POS_KEY) || "[]");
-    return Array.isArray(raw) ? raw : [];
+    if (!Array.isArray(raw)) return [];
+    return raw.filter((p) => /^0x[a-fA-F0-9]{64}$/.test(String(p?.hash || "")));
   } catch {
     return [];
   }
@@ -432,25 +434,64 @@ function showConnectOptions() {
     lede.textContent =
       "Choose how to connect. Browser wallets stay in this tab. WalletConnect uses a QR code.";
   }
+  const link = $("#connect-wc-link");
+  if (link) {
+    link.hidden = true;
+    link.removeAttribute("href");
+  }
+  const canvas = $("#connect-qr-canvas");
+  if (canvas?.getContext) {
+    const ctx = canvas.getContext("2d");
+    ctx?.clearRect(0, 0, canvas.width, canvas.height);
+  }
   setConnectStatus("");
 }
 
 function openConnectDialog() {
   const dialog = $("#connect-dialog");
-  if (!dialog) {
-    void connectWallet();
-    return;
-  }
+  if (!dialog) return;
   showConnectOptions();
+  void renderInjectedChoices();
   if (typeof dialog.showModal === "function") dialog.showModal();
   else dialog.setAttribute("open", "");
 }
 
 function closeConnectDialog() {
   const dialog = $("#connect-dialog");
+  void abortWalletConnect();
   if (!dialog) return;
   if (typeof dialog.close === "function") dialog.close();
   else dialog.removeAttribute("open");
+}
+
+async function renderInjectedChoices() {
+  const host = $("#connect-injected-list");
+  if (!host) return;
+  host.replaceChildren();
+  const wallets = await discoverInjected();
+  wallets.forEach((w) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "connect-option";
+    const strong = document.createElement("strong");
+    strong.textContent = w.name || "Browser wallet";
+    const span = document.createElement("span");
+    span.textContent = "Connect in this tab";
+    btn.append(strong, span);
+    btn.addEventListener("click", () => void onInjectedChoice(w));
+    host.append(btn);
+  });
+}
+
+async function onInjectedChoice(wallet) {
+  setConnectStatus("Opening your browser wallet…");
+  try {
+    await connectInjected(wallet.provider, wallet.rdns);
+    closeConnectDialog();
+  } catch (err) {
+    if (err?.code === 4001) setConnectStatus("Request rejected in the wallet.", "err");
+    else setConnectStatus(err?.message || "Browser wallet failed", "err");
+  }
 }
 
 function initConnectDialog() {
@@ -458,20 +499,27 @@ function initConnectDialog() {
   if (!dialog) return;
 
   $("#connect-close")?.addEventListener("click", () => closeConnectDialog());
-  $("#connect-qr-back")?.addEventListener("click", () => showConnectOptions());
+  $("#connect-qr-back")?.addEventListener("click", () => {
+    void abortWalletConnect();
+    showConnectOptions();
+  });
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog) closeConnectDialog();
   });
 
   $("#connect-injected")?.addEventListener("click", async () => {
-    setConnectStatus("Opening your browser wallet…");
+    setConnectStatus("Looking for a browser wallet…");
     try {
       const wallets = await discoverInjected();
       if (!wallets.length) {
         throw new Error("No browser wallet found. Install MetaMask or Rabby, or use WalletConnect.");
       }
-      await connectInjected(wallets[0].provider, wallets[0].rdns);
-      closeConnectDialog();
+      if (wallets.length === 1) {
+        await onInjectedChoice(wallets[0]);
+        return;
+      }
+      setConnectStatus("Pick the wallet to use.");
+      await renderInjectedChoices();
     } catch (err) {
       if (err?.code === 4001) setConnectStatus("Request rejected in the wallet.", "err");
       else setConnectStatus(err?.message || "Browser wallet failed", "err");
@@ -487,18 +535,27 @@ function initConnectDialog() {
     options?.setAttribute("hidden", "");
     qrBox?.removeAttribute("hidden");
     if (lede) lede.textContent = "Scan with a WalletConnect wallet.";
+    if (link) {
+      link.hidden = true;
+      link.removeAttribute("href");
+    }
     setConnectStatus("Waiting for WalletConnect…");
     try {
       await connectWalletConnect({
         onUri: async (uri) => {
+          if (!isWcV2Uri(uri)) {
+            setConnectStatus("WalletConnect returned an invalid pairing code.", "err");
+            return;
+          }
           if (canvas) {
             try {
               await renderWalletConnectQr(uri, canvas);
-            } catch {
-              /* canvas optional */
+            } catch (err) {
+              setConnectStatus(err?.message || "Could not draw the QR code.", "err");
+              return;
             }
           }
-          if (link && /^wc:/i.test(uri)) {
+          if (link) {
             link.href = uri;
             link.hidden = false;
           }
@@ -508,7 +565,7 @@ function initConnectDialog() {
       closeConnectDialog();
     } catch (err) {
       showConnectOptions();
-      if (/reset|closed|rejected|denied/i.test(String(err?.message || ""))) {
+      if (/reset|closed|rejected|denied|cancel/i.test(String(err?.message || "")) || err?.code === 4001) {
         setConnectStatus("WalletConnect cancelled.", "err");
       } else {
         setConnectStatus(err?.message || "WalletConnect failed", "err");

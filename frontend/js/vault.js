@@ -1,11 +1,11 @@
 import { config, isHexAddress, isTokenId, shortAddress } from "./config.js";
 import { getAddress } from "./wallet.js";
-import { explorerTx, readOwner, sendTx, waitReceipt } from "./pool.js";
+import { explorerTx, readOwner, sendTx } from "./pool.js";
 
 const VAULT_KEY = "lender-mera-vault-v1";
 const SEL = {
   transferFrom: "0x23b872dd",
-  setApprovalForAll: "0xa22cb465",
+  approve721: "0x095ea7b3",
   borrow: "0xb6529aee",
 };
 
@@ -81,9 +81,17 @@ export async function createOrOpenVault() {
 export async function transferNftToVault(collection, tokenId, vaultAddress) {
   const from = getAddress();
   if (!from) throw new Error("Connect the wallet that holds the NFT first");
+  const recorded = loadVaultRecord();
+  if (!recorded?.address) throw new Error("Open a Mera vault first");
+  if (String(vaultAddress).toLowerCase() !== recorded.address.toLowerCase()) {
+    throw new Error("Vault address does not match the stored passkey vault");
+  }
   if (!isHexAddress(collection) || !isTokenId(tokenId) || !isHexAddress(vaultAddress)) {
     throw new Error("Invalid transfer parameters");
   }
+  const { COLLECTIONS } = await import("./config.js");
+  const listed = COLLECTIONS.some((c) => c.address.toLowerCase() === collection.toLowerCase());
+  if (!listed) throw new Error("Collection is not listed on Lender");
   const owner = await readOwner(collection, tokenId);
   if (owner.toLowerCase() === vaultAddress.toLowerCase()) {
     return { alreadyThere: true, hash: null };
@@ -111,6 +119,11 @@ export async function waitUntilVaultOwns(collection, tokenId, vaultAddress, time
 export async function fundVaultForGas(vaultAddress, mon = "0.02") {
   const from = getAddress();
   if (!from) throw new Error("Connect a wallet to fund vault gas");
+  const recorded = loadVaultRecord();
+  if (!recorded?.address) throw new Error("Open a Mera vault first");
+  if (String(vaultAddress).toLowerCase() !== recorded.address.toLowerCase()) {
+    throw new Error("Vault address does not match the stored passkey vault");
+  }
   const { getProvider, ensureMonad } = await import("./wallet.js");
   const provider = getProvider();
   if (!provider) throw new Error("Connect a wallet to fund vault gas");
@@ -121,22 +134,19 @@ export async function fundVaultForGas(vaultAddress, mon = "0.02") {
     params: [vaultAddress, "latest"],
   });
   if (BigInt(balHex || "0x0") >= wei) return { funded: false };
-  const hash = await provider.request({
-    method: "eth_sendTransaction",
-    params: [
-      {
-        from,
-        to: vaultAddress,
-        value: "0x" + wei.toString(16),
-        chainId: config.chainIdHex,
-      },
-    ],
-  });
-  await waitReceipt(hash);
-  return { funded: true, hash };
+  const receipt = await sendTx(vaultAddress, "0x", "0x" + wei.toString(16));
+  return { funded: true, hash: receipt.hash };
 }
 
 export async function borrowFromVault({ secret, vaultAddress, collection, tokenId, amountHuman }) {
+  const recorded = loadVaultRecord();
+  if (!recorded?.address) throw new Error("Open a Mera vault first");
+  if (String(vaultAddress).toLowerCase() !== recorded.address.toLowerCase()) {
+    throw new Error("Vault address does not match the stored passkey vault");
+  }
+  const { COLLECTIONS } = await import("./config.js");
+  const listed = COLLECTIONS.some((c) => c.address.toLowerCase() === String(collection).toLowerCase());
+  if (!listed) throw new Error("Collection is not listed on Lender");
   const { Wallet, JsonRpcProvider, Contract } = await import("https://esm.sh/ethers@6.13.4");
   const wallet = new Wallet(toHex(secret), new JsonRpcProvider(config.rpcUrl, config.chainId));
   if (wallet.address.toLowerCase() !== vaultAddress.toLowerCase()) {
@@ -145,10 +155,10 @@ export async function borrowFromVault({ secret, vaultAddress, collection, tokenI
   const units = BigInt(Math.round(Number(amountHuman) * 10 ** config.usdcDecimals));
   const nft = new Contract(
     collection,
-    ["function setApprovalForAll(address operator, bool approved)"],
+    ["function approve(address to, uint256 tokenId)"],
     wallet
   );
-  const approveTx = await nft.setApprovalForAll(config.lendPoolAddress, true);
+  const approveTx = await nft.approve(config.lendPoolAddress, tokenId);
   await approveTx.wait();
   const pool = new Contract(
     config.lendPoolAddress,
