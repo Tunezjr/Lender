@@ -1,4 +1,4 @@
-const KEY = "lender-neverland-theme";
+const KEY = "lender-theme-v2";
 const THEMES = [
   { id: "neverland", label: "Neverland" },
   { id: "mermaid-lagoon", label: "Lagoon" },
