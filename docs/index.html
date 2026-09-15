@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="theme-grove">
+<html lang="en" class="theme-neverland">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,13 +19,15 @@
       (function () {
         try {
           var k = 'lender-neverland-theme';
-          var id = localStorage.getItem(k) || 'grove';
-          var ok = ['grove', 'neverland', 'skull-rock', 'mermaid-lagoon', 'second-star'];
-          if (ok.indexOf(id) < 0) id = 'grove';
-          document.documentElement.classList.add('theme-' + id);
-          document.documentElement.dataset.theme = id;
+          var id = localStorage.getItem(k) || 'neverland';
+          var ok = ['neverland', 'mermaid-lagoon', 'grove'];
+          if (ok.indexOf(id) < 0) id = 'neverland';
+          var r = document.documentElement;
+          r.classList.remove('theme-grove', 'theme-neverland', 'theme-skull-rock', 'theme-mermaid-lagoon', 'theme-second-star');
+          r.classList.add('theme-' + id);
+          r.dataset.theme = id;
         } catch (e) {
-          document.documentElement.classList.add('theme-grove');
+          document.documentElement.classList.add('theme-neverland');
         }
       })();
     </script>

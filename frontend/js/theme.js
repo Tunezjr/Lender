@@ -1,11 +1,10 @@
 const KEY = "lender-neverland-theme";
 const THEMES = [
-  { id: "grove", label: "Lender" },
   { id: "neverland", label: "Neverland" },
-  { id: "skull-rock", label: "Skull Rock" },
   { id: "mermaid-lagoon", label: "Lagoon" },
-  { id: "second-star", label: "Second Star" },
+  { id: "grove", label: "Lender" },
 ];
+const DEFAULT_THEME = "neverland";
 
 function readTheme() {
   try {
@@ -14,12 +13,13 @@ function readTheme() {
   } catch {
     /* ignore */
   }
-  return "grove";
+  return DEFAULT_THEME;
 }
 
 function applyTheme(id) {
   const root = document.documentElement;
   for (const t of THEMES) root.classList.remove(`theme-${t.id}`);
+  root.classList.remove("theme-skull-rock", "theme-second-star");
   root.classList.add(`theme-${id}`);
   root.dataset.theme = id;
   try {
